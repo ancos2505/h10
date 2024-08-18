@@ -1,0 +1,81 @@
+[package]
+edition = "2021"
+rust-version = "1.80.1"
+name = "h10"
+version = "0.1.0"
+description = "Simple HTTP/1.0 Server"
+readme = "README.md"
+keywords = ["html"]
+categories = [
+    "network-programming",
+    "web-programming",
+    "development-tools",
+    "rust-patterns",
+]
+license = "MIT"
+repository = "https://github.com/ancos2505/h10-server"
+
+
+[dependencies]
+html-rs = "0.1.4"
+
+
+[features]
+default = []
+debug = []
+
+[lints.rust]
+unsafe-code = "forbid"
+# box-pointers = "allow"
+deprecated-in-future = "forbid"
+deprecated-safe = "forbid"
+elided-lifetimes-in-paths = "forbid"
+explicit-outlives-requirements = "forbid"
+ffi-unwind-calls = "forbid"
+# fuzzy-provenance-casts = "forbid"  #Unstable
+# impl-trait-overcaptures = "forbid"  #Unstable
+keyword-idents-2018 = "forbid"
+keyword-idents-2024 = "forbid"
+let-underscore-drop = "forbid"
+# lossy-provenance-casts = "forbid"  #Unstable
+macro-use-extern-crate = "forbid"
+meta-variable-misuse = "forbid"
+missing-abi = "forbid"
+# missing-copy-implementations = "allow"
+missing-debug-implementations = "forbid"
+# missing-docs = "warn"
+missing-unsafe-on-extern = "forbid"
+# multiple-supertrait-upcastable = "forbid"  #Unstable
+# must-not-suspend = "forbid"  #Unstable
+non-ascii-idents = "forbid"
+# non-exhaustive-omitted-patterns = "forbid"  #Unstable
+non-local-definitions = "forbid"
+redundant-lifetimes = "forbid"
+rust-2021-incompatible-closure-captures = "forbid"
+rust-2021-incompatible-or-patterns = "forbid"
+rust-2021-prefixes-incompatible-syntax = "forbid"
+rust-2021-prelude-collisions = "forbid"
+# rust-2024-incompatible-pat = "forbid"  #Unstable
+single-use-lifetimes = "forbid"
+trivial-casts = "forbid"
+trivial-numeric-casts = "forbid"
+unit-bindings = "forbid"
+unnameable-types = "forbid"
+unsafe-op-in-unsafe-fn = "forbid"
+unstable-features = "forbid"
+unused-crate-dependencies = "forbid"
+unused-extern-crates = "forbid"
+unused-import-braces = "forbid"
+unused-lifetimes = "forbid"
+unused-macro-rules = "forbid"
+unused-qualifications = "forbid"
+unused-results = "allow"
+variant-size-differences = "forbid"
+invalid-type-param-default = "forbid"
+patterns-in-fns-without-body = "forbid"
+
+[lints.clippy]
+all = "deny"
+
+[badges]
+maintenance = { status = "experimental" }
