@@ -10,6 +10,7 @@ use html_rs::{Html, HtmlBody, HtmlHead, HtmlHeadItem};
 use crate::http::proto::headers::Connection;
 use crate::AppResult;
 
+use super::pages;
 use super::proto::headers::ContentType;
 use super::proto::response::Response;
 use super::proto::status_code::{StatusCode, OK};
@@ -74,24 +75,7 @@ impl HttpServer {
         prev_stats: &mut BTreeMap<String, (u64, u64)>,
         mut stream: TcpStream,
     ) -> AppResult<()> {
-        let html = Html::new()
-            .head(HtmlHeadItem::new(r#"<meta charset="utf-8">"#))
-            .head(HtmlHeadItem::new("<title>It works!</title>"))
-            .body(
-                HtmlBody::new()
-                    .set_attr("lang", "en")
-                    .set_attr("server-name", env!("CARGO_PKG_NAME"))
-                    .set_attr("server-version", env!("CARGO_PKG_VERSION"))
-                    .append_child(H1::builder().append_child(TextContent::text("It works!"))),
-            );
-
-        let status = StatusCode::<OK>::new();
-
-        let response = Response::new(status)
-            .header(ContentType::html())
-            .header(Connection::close())
-            .body_html(html);
-
+        let response = crate::http::pages::root();
         match stream.write(response.to_string().as_bytes()) {
             Ok(bytes) => println!("Response sent: {bytes} Bytes sent."),
             Err(e) => println!("Failed sending response: {}", e),

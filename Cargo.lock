@@ -4,13 +4,13 @@ version = 3
 
 [[package]]
 name = "h10"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "html-rs",
 ]
 
 [[package]]
 name = "html-rs"
-version = "0.1.5"
+version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6a0bcd89c8d5a01af0fee129c55db7525ccbd0834acdb2c493d5254045f63bdd"
+checksum = "49472c1d64feb36a41f625af70bee92f8feb50174a61e5570e2d2e77db0e16a1"

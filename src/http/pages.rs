@@ -1,44 +1,34 @@
+use std::fmt::{Debug, Display};
+
 use html_rs::{
-    elements::{Div, ElementBuilder, TextContent, P},
-    Html, HtmlBody, HtmlHeadItem, HtmlScript, HtmlStyle,
+    elements::{ElementBuilder, TextContent, H1},
+    Html, HtmlBody, HtmlHeadItem,
 };
 
-fn root<'a>() -> Html<'a> {
-    let title = HtmlHeadItem::new("<title>It works!</title>");
-    let style = HtmlStyle::new("body { color: #000000; }");
-    let script1 = HtmlScript::new(
-        format!(
-            r#"console.log("Hello from file {} at line {}")"#,
-            file!(),
-            line!(),
-        )
-        .as_str(),
-    );
+use crate::http::proto::{
+    headers::{Connection, ContentType},
+    status_code::{StatusCode, OK},
+};
 
-    let div = Div::builder().attr("class", "light-theme").append_child(
-        P::builder()
-            .attr("class", "light-theme")
-            .append_child(TextContent::text("It Works!")),
-    );
+use super::proto::response::Response;
 
-    let body = HtmlBody::new().script(script1).append_child(div);
-
-    let script2 = HtmlScript::new(
-        format!(
-            r#"console.log("Hello from file {} at line {}")"#,
-            file!(),
-            line!(),
-        )
-        .as_str(),
-    );
+pub fn root() -> Response<OK> {
     let html = Html::new()
-        .head(title)
-        .add_style(style)
-        .add_script(script2)
-        .body(body);
+        .head(HtmlHeadItem::new(r#"<meta charset="utf-8">"#))
+        .head(HtmlHeadItem::new("<title>It works!</title>"))
+        .body(
+            HtmlBody::new()
+                .set_attr("lang", "en")
+                .set_attr("server-name", env!("CARGO_PKG_NAME"))
+                .set_attr("server-version", env!("CARGO_PKG_VERSION"))
+                .append_child(H1::builder().append_child(TextContent::text("It works!"))),
+        );
 
     #[cfg(feature = "debug")]
     dbg!(&html);
 
-    html
+    Response::new(StatusCode::<OK>::new())
+        .header(ContentType::html())
+        .header(Connection::close())
+        .body_html(html)
 }
