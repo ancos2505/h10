@@ -2,7 +2,7 @@
 edition = "2021"
 rust-version = "1.80.1"
 name = "h10"
-version = "0.1.4"
+version = "0.1.5"
 description = "Simple HTTP/1.0 Server"
 readme = "README.md"
 keywords = ["html"]
@@ -13,7 +13,7 @@ categories = [
     "rust-patterns",
 ]
 license = "MIT"
-repository = "https://github.com/ancos2505/h10-server"
+repository = "https://github.com/ancos2505/h10"
 
 
 [dependencies]
