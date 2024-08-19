@@ -1,6 +1,6 @@
 use html_rs::{
-    elements::{ElementBuilder, TextContent, H1},
-    Html, HtmlBody, HtmlHeadItem,
+    elements::{ElementBuilder, Meta, TextContent, Title, H1},
+    Html, HtmlBody,
 };
 
 use crate::http::proto::{
@@ -12,8 +12,8 @@ use super::proto::response::Response;
 
 pub fn root() -> Response<OK> {
     let html = Html::new()
-        .head(HtmlHeadItem::new(r#"<meta charset="utf-8">"#))
-        .head(HtmlHeadItem::new("<title>It works!</title>"))
+        .head(Title::builder().append_child(TextContent::text("It works!")))
+        .head(Meta::builder().attr("charset", "utf-8"))
         .body(
             HtmlBody::new()
                 .set_attr("lang", "en")
