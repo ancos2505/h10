@@ -1,19 +1,12 @@
-use std::collections::BTreeMap;
-use std::io::{Read, Write};
-use std::net::{TcpListener, TcpStream};
-use std::sync::{Arc, Mutex};
-use std::thread;
+use std::{
+    collections::BTreeMap,
+    io::{Read, Write},
+    net::{TcpListener, TcpStream},
+    sync::{Arc, Mutex},
+    thread,
+};
 
-use html_rs::elements::{ElementBuilder, TextContent, H1};
-use html_rs::{Html, HtmlBody, HtmlHead, HtmlHeadItem};
-
-use crate::http::proto::headers::Connection;
 use crate::AppResult;
-
-use super::pages;
-use super::proto::headers::ContentType;
-use super::proto::response::Response;
-use super::proto::status_code::{StatusCode, OK};
 
 const CHUNK_SIZE: usize = 4096;
 

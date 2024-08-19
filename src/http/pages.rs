@@ -1,5 +1,3 @@
-use std::fmt::{Debug, Display};
-
 use html_rs::{
     elements::{ElementBuilder, TextContent, H1},
     Html, HtmlBody, HtmlHeadItem,
@@ -30,5 +28,5 @@ pub fn root() -> Response<OK> {
     Response::new(StatusCode::<OK>::new())
         .header(ContentType::html())
         .header(Connection::close())
-        .body_html(html)
+        .body(html)
 }

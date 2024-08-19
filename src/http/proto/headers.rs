@@ -123,3 +123,20 @@ pub(crate) struct ContentLength {
     name: String,
     value: usize,
 }
+impl ContentLength {
+    pub fn length(len: usize) -> Self {
+        Self {
+            name: "Content-Length".into(),
+            value: len,
+        }
+    }
+}
+impl IntoHeader for ContentLength {
+    fn into_header(self) -> HttpHeader {
+        let Self { name, value } = self;
+        HttpHeader {
+            name,
+            value: value.to_string(),
+        }
+    }
+}

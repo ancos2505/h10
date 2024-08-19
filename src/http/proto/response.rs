@@ -16,21 +16,12 @@ use super::{
 
 pub const URL_MAX_LENGTH: usize = 4096;
 
-/*
-< HTTP/1.0 404 File not found
-< Server: SimpleHTTP/0.6 Python/3.11.2
-< Date: Sun, 18 Aug 2024 10:28:41 GMT
-< Connection: close
-< Content-Type: text/html;charset=utf-8
-< Content-Length: 335
-
-*/
 #[derive(Debug)]
 pub struct Response<T: Debug + Display + ValidCode> {
     http_version: Version,
     status: StatusCode<T>,
     headers: HashMap<String, String>,
-    body: Option<Body>,
+    body: Option<String>,
 }
 
 impl<T: Debug + Display + ValidCode> Display for Response<T> {
@@ -49,7 +40,7 @@ impl<T: Debug + Display + ValidCode> Display for Response<T> {
         output.push_str("\r\n");
 
         if let Some(body) = &self.body {
-            output.push_str(body.0.as_str());
+            output.push_str(body.as_str());
         }
 
         output.push_str("\r\n\r\n");
@@ -76,12 +67,17 @@ impl<T: Debug + Display + ValidCode> Response<T> {
             body: self.body,
         }
     }
-    pub fn body_html(self, body: Html<'_>) -> Response<T> {
+    pub fn body<B: ToString>(self, body: B) -> Response<T> {
+        use crate::http::proto::headers::ContentLength;
+        let body = body.to_string();
+
+        let response = self.header(ContentLength::length(body.len() + 4));
+
         Response {
-            http_version: self.http_version,
-            status: self.status,
-            headers: self.headers,
-            body: Some(body.into()),
+            http_version: response.http_version,
+            status: response.status,
+            headers: response.headers,
+            body: Some(body),
         }
     }
 }
