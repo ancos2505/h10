@@ -4,6 +4,10 @@ use std::net::{TcpListener, TcpStream};
 use std::sync::{Arc, Mutex};
 use std::thread;
 
+use html_rs::elements::{ElementBuilder, TextContent, H1};
+use html_rs::{Html, HtmlBody, HtmlHead, HtmlHeadItem};
+
+use crate::http::proto::headers::Connection;
 use crate::AppResult;
 
 use super::proto::headers::ContentType;
@@ -70,48 +74,25 @@ impl HttpServer {
         prev_stats: &mut BTreeMap<String, (u64, u64)>,
         mut stream: TcpStream,
     ) -> AppResult<()> {
-        // let response = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n<html><body>Hello world</body></html>\r\n";
-        // let http_response_header =
-        //     "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n";
+        let html = Html::new()
+            .head(HtmlHeadItem::new(r#"<meta charset="utf-8">"#))
+            .head(HtmlHeadItem::new("<title>It works!</title>"))
+            .body(
+                HtmlBody::new()
+                    .set_attr("lang", "en")
+                    .set_attr("server-name", env!("CARGO_PKG_NAME"))
+                    .set_attr("server-version", env!("CARGO_PKG_VERSION"))
+                    .append_child(H1::builder().append_child(TextContent::text("It works!"))),
+            );
+
         let status = StatusCode::<OK>::new();
-        let response = Box::new(Response::new(status));
 
-        let content_type = ContentType::html();
+        let response = Response::new(status)
+            .header(ContentType::html())
+            .header(Connection::close())
+            .body_html(html);
 
-        let html_page_content = format!(
-            r#"<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="3">
-    <title>{}/{}</title>
-</head>
-<body>"#,
-            env!("CARGO_PKG_NAME"),
-            env!("CARGO_PKG_VERSION"),
-        );
-        let http_response_footer = "\n</body>\n</html>\r\n";
-
-        // let terminal_output = Terminal::new().render()
-        // .replace("\n", "<br/>")
-        // ;
-        // println!("");
-        // dbg!(&terminal_output);
-        // let stats = Stats::new().render(prev_stats)?;
-        // let mut response = "".to_string();
-        // response.push_str(http_response_header);
-        // response.push_str(&html_page_content);
-        // response.push_str(&stats);
-        // response.push_str(&terminal_output);
-        // response.push_str(&http_response_footer);
-        dbg!(&response);
-
-        let response_str = response.to_string();
-
-        dbg!(&response_str);
-
-        match stream.write(response_str.as_bytes()) {
+        match stream.write(response.to_string().as_bytes()) {
             Ok(bytes) => println!("Response sent: {bytes} Bytes sent."),
             Err(e) => println!("Failed sending response: {}", e),
         }

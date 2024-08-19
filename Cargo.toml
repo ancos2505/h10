@@ -2,7 +2,7 @@
 edition = "2021"
 rust-version = "1.80.1"
 name = "h10"
-version = "0.1.0"
+version = "0.1.1"
 description = "Simple HTTP/1.0 Server"
 readme = "README.md"
 keywords = ["html"]
@@ -17,7 +17,7 @@ repository = "https://github.com/ancos2505/h10-server"
 
 
 [dependencies]
-html-rs = "0.1.4"
+html-rs = "0.1"
 
 
 [features]
@@ -57,7 +57,7 @@ rust-2021-prefixes-incompatible-syntax = "forbid"
 rust-2021-prelude-collisions = "forbid"
 # rust-2024-incompatible-pat = "forbid"  #Unstable
 single-use-lifetimes = "forbid"
-trivial-casts = "forbid"
+trivial-casts = "deny"
 trivial-numeric-casts = "forbid"
 unit-bindings = "forbid"
 unnameable-types = "forbid"
