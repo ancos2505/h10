@@ -1,0 +1,24 @@
+/// ### Content-Encoding
+/// Related: Compression, Encryption, Base64
+///
+///  When present, its value indicates what additional content coding has been
+/// applied to the resource, and thus what decoding mechanism must be applied in
+/// order to obtain the media-type referenced by the Content-Type header field.
+///
+
+///
+/// Reference: https://www.rfc-editor.org/rfc/rfc1945.html#section-10.3
+#[derive(Debug, PartialEq, Eq)]
+pub(crate) struct ContentEncoding {
+    name: String,
+    value: String,
+}
+
+impl ContentEncoding {
+    pub fn gzip() -> Self {
+        Self {
+            name: "Content-Encoding".into(),
+            value: "x-gzip".into(),
+        }
+    }
+}

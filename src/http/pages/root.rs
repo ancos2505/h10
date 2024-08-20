@@ -5,7 +5,7 @@ use html_rs::{
 
 use crate::{
     http::proto::{
-        headers::{Connection, ContentType, Date, Pragma, Server},
+        headers::{ContentType, Date, Pragma, Server},
         status_code::StatusCode,
     },
     result::ServerResult,
@@ -30,7 +30,6 @@ pub fn root() -> ServerResult<Response> {
 
     Ok(Response::new(StatusCode::OK)
         .header(ContentType::html())
-        .header(Connection::close())
         .header(Date::now()?)
         .header(Server::default())
         .header(Pragma::default())

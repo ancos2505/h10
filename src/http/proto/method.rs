@@ -5,11 +5,18 @@ use crate::result::H10ServerError;
 /// ### HTTP Method
 ///
 /// Reference: https://www.rfc-editor.org/rfc/rfc1945.html#section-5.1.1
+/// 
+/// Aditional methods: https://www.rfc-editor.org/rfc/rfc1945.html#appendix-D.1
 #[derive(Debug)]
 pub enum Method {
     Get,
     Head,
     Post,
+    // Aditional methods,
+    Put,
+    Delete,
+    Link,
+    Unlink,
 }
 
 impl FromStr for Method {
@@ -20,6 +27,10 @@ impl FromStr for Method {
             "GET" => Self::Get,
             "HEAD" => Self::Head,
             "POST" => Self::Post,
+            "PUT" => Self::Put,
+            "DELETE" => Self::Delete,
+            "LINK" => Self::Link,
+            "UNLINK" => Self::Unlink,
             _ => return Err(H10ServerError("Invalid HTTP Method".to_owned())),
         };
         Ok(method)
@@ -32,6 +43,10 @@ impl Display for Method {
             Self::Get => "GET".to_owned(),
             Self::Head => "HEAD".to_owned(),
             Self::Post => "POST".to_owned(),
+            Self::Put => "PUT".to_owned(),
+            Self::Delete => "DELETE".to_owned(),
+            Self::Link => "LINK".to_owned(),
+            Self::Unlink => "UNLINK".to_owned(),
         };
         write!(f, "{output}")
     }

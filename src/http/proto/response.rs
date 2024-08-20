@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt::{Debug, Display}, str::FromStr};
+use std::{collections::BTreeMap, fmt::{Debug, Display}, str::FromStr};
 
 use html_rs::Html;
 
@@ -16,7 +16,7 @@ pub const URL_MAX_LENGTH: usize = 4096;
 pub struct Response {
     http_version: Version,
     status: StatusCode,
-    headers: HashMap<String, String>,
+    headers: BTreeMap<String, String>,
     body: Option<String>,
 }
 

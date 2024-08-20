@@ -5,7 +5,7 @@ use html_rs::{
 
 use crate::{
     http::proto::{
-        headers::{Connection, ContentType, Date, Pragma, Server},
+        headers::{ContentType, Date, Pragma, Server},
         status_code::StatusCode,
     },
     result::ServerResult,
@@ -30,7 +30,6 @@ pub fn error_404() -> Response {
 
     Response::new(StatusCode::NotFound)
         .header(ContentType::html())
-        .header(Connection::close())
         .header(Server::default())
         .header(Pragma::default())
         .body(html)

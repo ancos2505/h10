@@ -24,7 +24,6 @@ impl FromStr for Version {
     type Err = H10ServerError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        dbg!(s);
         match s {
             "HTTP/1.0" => Ok(Self::Http1_0),
             _ => Err(H10ServerError("Version not supported".into())),

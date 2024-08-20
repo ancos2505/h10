@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use crate::result::{H10ServerError, ServerResult};
 
@@ -6,7 +6,7 @@ const URL_PARTS_MAX_CHARS: usize = 1024;
 #[derive(Debug)]
 pub struct UrlParts {
     pub path: Option<String>,
-    query: Option<HashMap<String, String>>,
+    query: Option<BTreeMap<String, String>>,
     fragment: Option<String>,
 }
 
@@ -20,7 +20,7 @@ impl UrlParts {
                 .map(|s| s.to_string())
                 .filter(|s| !s.is_empty());
 
-            let mut queries_string = HashMap::new();
+            let mut queries_string = BTreeMap::new();
 
             let maybe_fragment = input
                 .split_once('#')
@@ -31,7 +31,6 @@ impl UrlParts {
                     input.split_once('?').map(|(_, query_string)| query_string);
 
                 if let Some(query_string) = maybe_query_string.and_then(|s| s.split("#").next()) {
-                    dbg!(query_string);
                     let mut iter = query_string.split("&");
                     while let Some(param) = iter.next() {
                         let mut kv_iter = param.split("=");
