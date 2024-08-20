@@ -23,7 +23,13 @@ impl<'a> Request<'a> {
             return Err(H10ServerError("Request is larger than 10 MBytes".into()));
         }
         let mut request = Request::default();
-        let mut iter = input.split(" ");
+
+        let preamble = input
+            .split("\r\n")
+            .next()
+            .ok_or(H10ServerError("HTTP Preamble not found".into()))?;
+
+        let mut iter = preamble.split(" ");
         let method_str = iter
             .next()
             .ok_or(H10ServerError("Method not found".into()))?;
