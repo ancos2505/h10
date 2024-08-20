@@ -5,7 +5,7 @@ use std::{
     num::{ParseFloatError, ParseIntError},
 };
 
-pub(crate) type AppResult<T> = Result<T, H10ServerError>;
+pub(crate) type ServerResult<T> = Result<T, H10ServerError>;
 
 #[derive(Debug)]
 pub struct H10ServerError(pub String);

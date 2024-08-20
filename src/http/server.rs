@@ -6,13 +6,13 @@ use std::{
     thread,
 };
 
-use crate::AppResult;
+use crate::ServerResult;
 
 const CHUNK_SIZE: usize = 4096;
 
 pub struct HttpServer;
 impl HttpServer {
-    pub fn run() -> AppResult<()> {
+    pub fn run() -> ServerResult<()> {
         let port = 8080;
         let listener = TcpListener::bind(format!("0.0.0.0:{port}"))?;
 
@@ -48,7 +48,7 @@ impl HttpServer {
     fn handle_client(
         prev_stats: &mut BTreeMap<String, (u64, u64)>,
         stream: TcpStream,
-    ) -> AppResult<()> {
+    ) -> ServerResult<()> {
         Self::handle_read(&stream);
 
         Self::handle_write(prev_stats, stream)?;
@@ -67,7 +67,7 @@ impl HttpServer {
     fn handle_write(
         prev_stats: &mut BTreeMap<String, (u64, u64)>,
         mut stream: TcpStream,
-    ) -> AppResult<()> {
+    ) -> ServerResult<()> {
         let response = crate::http::pages::root();
         match stream.write(response.to_string().as_bytes()) {
             Ok(bytes) => println!("Response sent: {bytes} Bytes sent."),

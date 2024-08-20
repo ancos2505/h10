@@ -11,11 +11,11 @@ use crate::http::proto::{
 use super::proto::response::Response;
 
 pub fn root() -> Response<OK> {
-    let html = Html::new()
-        .head(Title::builder().append_child(TextContent::text("It works!")))
-        .head(Meta::builder().attr("charset", "utf-8"))
+    let html = Html::builder()
+        .head_item(Title::builder().append_child(TextContent::text("It works!")))
+        .head_item(Meta::builder().attr("charset", "utf-8"))
         .body(
-            HtmlBody::new()
+            HtmlBody::builder()
                 .set_attr("lang", "en")
                 .set_attr("server-name", env!("CARGO_PKG_NAME"))
                 .set_attr("server-version", env!("CARGO_PKG_VERSION"))

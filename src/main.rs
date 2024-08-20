@@ -1,8 +1,8 @@
 mod http;
 mod result;
 
-use crate::{http::HttpServer, result::AppResult};
+use crate::{http::HttpServer, result::ServerResult};
 
-fn main() -> AppResult<()> {
+fn main() -> ServerResult<()> {
     HttpServer::run()
 }
