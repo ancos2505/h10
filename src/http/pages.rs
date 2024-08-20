@@ -1,32 +1,38 @@
-use html_rs::{
-    elements::{ElementBuilder, Meta, TextContent, Title, H1},
-    Html, HtmlBody,
-};
+use std::borrow::Cow;
 
-use crate::http::proto::{
-    headers::{Connection, ContentType},
-    status_code::{StatusCode, OK},
-};
+use super::proto::request::Request;
 
-use super::proto::response::Response;
+mod error_404;
+mod root;
 
-pub fn root() -> Response<OK> {
-    let html = Html::builder()
-        .head_item(Title::builder().append_child(TextContent::text("It works!")))
-        .head_item(Meta::builder().attr("charset", "utf-8"))
-        .body(
-            HtmlBody::builder()
-                .set_attr("lang", "en")
-                .set_attr("server-name", env!("CARGO_PKG_NAME"))
-                .set_attr("server-version", env!("CARGO_PKG_VERSION"))
-                .append_child(H1::builder().append_child(TextContent::text("It works!"))),
-        );
+pub struct Endpoint;
 
-    #[cfg(feature = "debug")]
-    dbg!(&html);
+impl<'a> Endpoint {
+    pub fn dispatcher(request: Cow<'a, str>) -> String {
+        use super::pages::{error_404::error_404, root::root};
+        let request = match Request::parse(request) {
+            Ok(req) => req,
+            Err(err) => {
+                eprintln!("{err}");
+                return error_404().to_string();
+            }
+        };
 
-    Response::new(StatusCode::<OK>::new())
-        .header(ContentType::html())
-        .header(Connection::close())
-        .body(html)
+        dbg!(&request.path);
+        let maybe_response = request
+            .path
+            .and_then(|url| url.path)
+            .and_then(|path| match &*path {
+                "" => root().ok(),
+                "/" => root().ok(),
+                _ => Some(error_404()),
+            })
+            .or_else(|| root().ok())
+            .map(|res| res.to_string());
+        if let Some(response) = maybe_response {
+            return response;
+        } else {
+            error_404().to_string()
+        }
+    }
 }

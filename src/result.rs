@@ -3,6 +3,7 @@ use std::{
     fmt::Display,
     io::Error as IoError,
     num::{ParseFloatError, ParseIntError},
+    time::SystemTimeError,
 };
 
 pub(crate) type ServerResult<T> = Result<T, H10ServerError>;
@@ -12,6 +13,12 @@ pub struct H10ServerError(pub String);
 
 impl From<ParseFloatError> for H10ServerError {
     fn from(error: ParseFloatError) -> Self {
+        Self(error.to_string())
+    }
+}
+
+impl From<SystemTimeError> for H10ServerError {
+    fn from(error: SystemTimeError) -> Self {
         Self(error.to_string())
     }
 }

@@ -6,7 +6,7 @@ use std::{
     thread,
 };
 
-use crate::ServerResult;
+use crate::{http::pages::Endpoint, result::H10ServerError, ServerResult};
 
 const CHUNK_SIZE: usize = 4096;
 
@@ -49,27 +49,32 @@ impl HttpServer {
         prev_stats: &mut BTreeMap<String, (u64, u64)>,
         stream: TcpStream,
     ) -> ServerResult<()> {
-        Self::handle_read(&stream);
+        let response_str = Self::handle_read(&stream)?;
 
-        Self::handle_write(prev_stats, stream)?;
+        Self::handle_write(prev_stats, stream, response_str)?;
         Ok(())
     }
-    fn handle_read(mut stream: &TcpStream) {
+    fn handle_read(mut stream: &TcpStream) -> ServerResult<String> {
         let mut buf = [0u8; CHUNK_SIZE];
         match stream.read(&mut buf) {
             Ok(_) => {
                 let req_str = String::from_utf8_lossy(&buf);
                 println!("{}", req_str);
+                Ok(Endpoint::dispatcher(req_str).to_string())
             }
-            Err(e) => println!("Unable to read stream: {}", e),
+            Err(e) => {
+                let error = e.to_string();
+                println!("Unable to read stream: {}", error);
+                Err(H10ServerError(error.to_string()))
+            }
         }
     }
     fn handle_write(
         prev_stats: &mut BTreeMap<String, (u64, u64)>,
         mut stream: TcpStream,
+        response_str: String,
     ) -> ServerResult<()> {
-        let response = crate::http::pages::root();
-        match stream.write(response.to_string().as_bytes()) {
+        match stream.write(response_str.as_bytes()) {
             Ok(bytes) => println!("Response sent: {bytes} Bytes sent."),
             Err(e) => println!("Failed sending response: {}", e),
         }

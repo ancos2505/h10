@@ -1,28 +1,30 @@
-use std::{collections::HashMap, str::FromStr};
+use std::collections::HashMap;
 
 use crate::result::{H10ServerError, ServerResult};
 
 const URL_PARTS_MAX_CHARS: usize = 1024;
 #[derive(Debug)]
-struct UrlParts<'a> {
-    input: &'a str,
-    path: Option<&'a str>,
-    query: Option<HashMap<&'a str, &'a str>>,
-    fragment: Option<&'a str>,
+pub struct UrlParts {
+    pub path: Option<String>,
+    query: Option<HashMap<String, String>>,
+    fragment: Option<String>,
 }
 
-impl<'a> UrlParts<'a> {
-    fn parse(input: &'a str) -> ServerResult<Self> {
+impl UrlParts {
+    pub fn parse(input: &str) -> ServerResult<UrlParts> {
         if input.chars().count() < URL_PARTS_MAX_CHARS {
             let maybe_path = input
                 .split('#')
                 .next()
                 .and_then(|s| s.split('?').next())
+                .map(|s| s.to_string())
                 .filter(|s| !s.is_empty());
 
             let mut queries_string = HashMap::new();
 
-            let maybe_fragment = input.split_once('#').map(|(_, fragment)| fragment);
+            let maybe_fragment = input
+                .split_once('#')
+                .map(|(_, fragment)| fragment.to_string());
 
             {
                 let maybe_query_string =
@@ -38,7 +40,7 @@ impl<'a> UrlParts<'a> {
 
                         match (opt_k, opt_v) {
                             (Some(k), Some(v)) => {
-                                queries_string.insert(k, v);
+                                queries_string.insert(k.to_string(), v.to_string());
                             }
                             _ => (),
                         }
@@ -46,7 +48,6 @@ impl<'a> UrlParts<'a> {
                 }
             }
             Ok(UrlParts {
-                input,
                 path: maybe_path,
                 query: if queries_string.len() > 0 {
                     Some(queries_string)

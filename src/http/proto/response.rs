@@ -1,8 +1,4 @@
-use std::{
-    collections::HashMap,
-    fmt::{Debug, Display},
-    str::FromStr,
-};
+use std::{collections::HashMap, fmt::{Debug, Display}, str::FromStr};
 
 use html_rs::Html;
 
@@ -10,21 +6,21 @@ use crate::result::H10ServerError;
 
 use super::{
     headers::{HttpHeader, IntoHeader},
-    status_code::{StatusCode, ValidCode},
+    status_code::StatusCode,
     version::Version,
 };
 
 pub const URL_MAX_LENGTH: usize = 4096;
 
 #[derive(Debug)]
-pub struct Response<T: Debug + Display + ValidCode> {
+pub struct Response {
     http_version: Version,
-    status: StatusCode<T>,
+    status: StatusCode,
     headers: HashMap<String, String>,
     body: Option<String>,
 }
 
-impl<T: Debug + Display + ValidCode> Display for Response<T> {
+impl Display for Response {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut output = "".to_owned();
         output.push_str(&self.http_version.to_string());
@@ -48,8 +44,8 @@ impl<T: Debug + Display + ValidCode> Display for Response<T> {
         write!(f, "{}", output)
     }
 }
-impl<T: Debug + Display + ValidCode> Response<T> {
-    pub fn new(status: StatusCode<T>) -> Response<T> {
+impl Response {
+    pub fn new(status: StatusCode) -> Response {
         Response {
             http_version: Default::default(),
             status,
@@ -57,7 +53,7 @@ impl<T: Debug + Display + ValidCode> Response<T> {
             body: Default::default(),
         }
     }
-    pub fn header<H: IntoHeader>(mut self, header: H) -> Response<T> {
+    pub fn header<H: IntoHeader>(mut self, header: H) -> Response {
         let HttpHeader { name, value } = header.into_header();
         self.headers.insert(name, value);
         Response {
@@ -67,7 +63,7 @@ impl<T: Debug + Display + ValidCode> Response<T> {
             body: self.body,
         }
     }
-    pub fn body<B: ToString>(self, body: B) -> Response<T> {
+    pub fn body<B: ToString>(self, body: B) -> Response {
         use crate::http::proto::headers::ContentLength;
         let body = body.to_string();
 
