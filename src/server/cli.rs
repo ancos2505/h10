@@ -7,6 +7,8 @@ mod verbose;
 
 use std::{collections::BTreeMap, env::Args};
 
+use h10::http::{headers::Server, result::H10LibError};
+
 use crate::server::cli::traits::ArgName;
 
 use super::{ServerError, ServerResult};
@@ -50,41 +52,47 @@ impl Cli {
         );
         eprintln!("");
         eprintln!("Options:");
-        eprintln!(r#"    --help                        Display this message"#);
+        eprintln!(r#"  --help                      Display this message"#);
         eprintln!("");
         eprintln!(
-            r#"    --verbose                     Show raw contents from both Request and Response"#
+            r#"  --verbose                   Show raw contents from both Request and Response"#
         );
         eprintln!("");
+        eprintln!(r#"  --http1.0                   Enable strict HTTP/1.0 strict mode (RFC1945)"#);
         eprintln!(
-            r#"    --http1.0                     Enable strict HTTP/1.0 strict mode (RFC1945)"#
-        );
-        eprintln!(
-            r#"                                  WARNING: The nowday's browsers doesn't use it anymore"#
+            r#"                              WARNING: The nowday's browsers doesn't use it anymore"#
         );
         eprintln!("");
-        eprintln!(r#"    --ip-address=<IP ADDRESS>     IPv4 or IPv6 to listening"#);
+        eprintln!(r#"  --ip-address=<IP ADDRESS>   IPv4 or IPv6 to listening"#);
         eprintln!("");
         eprintln!(
-            r#"    --port=<PORT NUMBER>          Port to listen [1024-65535] (RFC7605#section-4)"#
+            r#"  --port=<PORT NUMBER>        Port to listen [1024-65535] (RFC7605#section-4)"#
         );
         eprintln!("");
     }
 }
 
-impl From<CliArgs> for Cli {
-    fn from(mut value: CliArgs) -> Self {
+impl TryFrom<CliArgs> for Cli {
+    type Error = ServerError;
+    fn try_from(mut value: CliArgs) -> Result<Self, Self::Error> {
         let is_help = value.0.contains_key(&CliHelp::arg_name());
-        let ip_address = value
-            .0
-            .remove(&CliIpAddress::arg_name())
-            .and_then(|v| v.parse::<CliIpAddress>().ok())
-            .unwrap_or_default();
-        let port = value
-            .0
-            .remove(&CliPortNumber::arg_name())
-            .and_then(|v| v.parse::<CliPortNumber>().ok())
-            .unwrap_or_default();
+
+        let ip_address = {
+            if let Some(arg) = value.0.remove(&CliIpAddress::arg_name()) {
+                arg.parse::<CliIpAddress>()?
+            } else {
+                CliIpAddress::default()
+            }
+        };
+
+        let port = {
+            if let Some(arg) = value.0.remove(&CliPortNumber::arg_name()) {
+                arg.parse::<CliPortNumber>()?
+            } else {
+                CliPortNumber::default()
+            }
+        };
+
         let h10_strict_mode = value
             .0
             .remove(&CliHttp10StrictMode::arg_name())
@@ -95,13 +103,13 @@ impl From<CliArgs> for Cli {
             .remove(&CliVerboseMode::arg_name())
             .map(|_| CliVerboseMode::Enabled)
             .unwrap_or_default();
-        Self {
+        Ok(Self {
             is_help,
             ip_address,
             port,
             h10_strict_mode,
             verbose,
-        }
+        })
     }
 }
 
@@ -147,7 +155,7 @@ impl TryFrom<Args> for Cli {
                 return Err(ServerError::InvalidCLiArgs(arg_to_parse));
             }
         }
-        Ok(cli_args.into())
+        cli_args.try_into()
     }
 }
 

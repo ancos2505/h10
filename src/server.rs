@@ -190,9 +190,9 @@ impl HttpServer {
         );
     }
     fn handle_read(mut stream: &TcpStream) -> H10LibResult<ServerResponse> {
-        let slow_motion = Duration::from_millis(1234);
+        // let slow_motion = Duration::from_millis(1234);
         // dbg!(slow_motion);
-        sleep(slow_motion);
+        // sleep(slow_motion);
         // TODO
         let mut buf = [0u8; Self::CHUNK_SIZE];
         match stream.read(&mut buf) {
