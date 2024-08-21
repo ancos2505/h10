@@ -20,27 +20,27 @@ pub struct Request<'a> {
 impl<'a> Request<'a> {
     pub fn parse(input: Cow<'a, str>) -> ServerResult<Self> {
         if input.len() > TEN_MEGABYTES {
-            return Err(H10ServerError("Request is larger than 10 MBytes".into()));
+            return Err(H10ServerError::InvalidInputData(
+                "Request is larger than 10 MBytes".into(),
+            ));
         }
         let mut request = Request::default();
 
         let preamble = input
             .split("\r\n")
             .next()
-            .ok_or(H10ServerError("HTTP Preamble not found".into()))?;
+            .ok_or(H10ServerError::InvalidInputData(
+                "HTTP Preamble not found".into(),
+            ))?;
 
         let mut iter = preamble.split(" ");
-        let method_str = iter
-            .next()
-            .ok_or(H10ServerError("Method not found".into()))?;
+        let method_str = iter.next().ok_or(H10ServerError::MethodNotSupported)?;
 
-        let path_str = iter
-            .next()
-            .ok_or(H10ServerError("Url Path not found".into()))?;
+        let path_str = iter.next().ok_or(H10ServerError::InvalidInputData(
+            "Url Path not found".into(),
+        ))?;
 
-        let version_str = iter
-            .next()
-            .ok_or(H10ServerError("Version not found".into()))?;
+        let version_str = iter.next().ok_or(H10ServerError::VersionNotSupported)?;
 
         request.method = Some(method_str.parse::<Method>()?);
         request.path = Some(UrlParts::parse(path_str)?);

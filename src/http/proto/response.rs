@@ -93,12 +93,14 @@ impl FromStr for UrlPath {
                 if c.is_alphanumeric() || c.is_ascii_punctuation() {
                     continue;
                 } else {
-                    return Err(H10ServerError("Invalid char for URL".into()));
+                    return Err(H10ServerError::InvalidInputData(
+                        "Invalid char for URL".into(),
+                    ));
                 }
             }
             Ok(Self(s.to_owned()))
         } else {
-            Err(H10ServerError("Path is too large".into()))
+            Err(H10ServerError::InvalidInputData("Path is too large".into()))
         }
     }
 }

@@ -73,7 +73,7 @@ impl HttpServer {
         // prev_stats: &mut BTreeMap<String, (u64, u64)>,
         stream: TcpStream,
         arc_act_session: &Arc<Mutex<usize>>,
-    ) -> ServerResult<()> {
+    ) {
         let now = Instant::now();
 
         let act_session = Arc::clone(arc_act_session);
@@ -98,27 +98,36 @@ impl HttpServer {
                         dbg!(error);
                     }
                 };
-                Self::handle_read(&stream)?
+                match Self::handle_read(&stream) {
+                    Ok(res) => res.to_string(),
+                    Err(error) => {
+                        dbg!(error);
+                        Response::new(StatusCode::ServiceUnavailable).to_string()
+                    }
+                }
             } else {
-                let status = StatusCode::ServiceUnavailable;
-                Response::new(status).to_string()
+                Response::new(StatusCode::ServiceUnavailable).to_string()
             }
         } else {
-            let status = StatusCode::ServiceUnavailable;
-            Response::new(status).to_string()
+            Response::new(StatusCode::ServiceUnavailable).to_string()
         };
 
-        Self::handle_write(arc_prev_stats, stream, response_str, arc_act_session)?;
+        if let Err(error) =
+            Self::handle_write(arc_prev_stats, stream, response_str, arc_act_session)
+        {
+            dbg!(error);
+        }
+
         println!(
             "Active sessions: {:?}. Response generated in {} secs. ",
             opened_sessions,
             now.elapsed().as_secs_f64(),
         );
-
-        Ok(())
     }
     fn handle_read(mut stream: &TcpStream) -> ServerResult<String> {
-        sleep(Duration::from_millis(1234));
+        let slow_motion = Duration::from_millis(1234);
+        dbg!(slow_motion);
+        sleep(slow_motion);
         let mut buf = [0u8; CHUNK_SIZE];
         match stream.read(&mut buf) {
             Ok(_) => {
@@ -126,10 +135,9 @@ impl HttpServer {
                 // println!("{}", req_str);
                 Ok(Endpoint::dispatcher(req_str).to_string())
             }
-            Err(e) => {
-                let error = e.to_string();
-                println!("Unable to read stream: {}", error);
-                Err(H10ServerError(error.to_string()))
+            Err(err) => {
+                println!("Unable to read stream: {}", err);
+                Err(H10ServerError::IoError(err))
             }
         }
     }

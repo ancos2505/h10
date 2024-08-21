@@ -56,7 +56,7 @@ impl UrlParts {
                 fragment: maybe_fragment,
             })
         } else {
-            Err(H10ServerError("Error: URL max length reached.".into()))
+            Err(H10ServerError::InvalidInputData("Error: URL max length reached.".into()))
         }
     }
 }

@@ -31,7 +31,7 @@ impl FromStr for Method {
             "DELETE" => Self::Delete,
             "LINK" => Self::Link,
             "UNLINK" => Self::Unlink,
-            _ => return Err(H10ServerError("Invalid HTTP Method".to_owned())),
+            _ => return Err(H10ServerError::MethodNotSupported),
         };
         Ok(method)
     }
