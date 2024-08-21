@@ -31,6 +31,14 @@ impl ContentType {
             value: "text/html; charset=UTF-8".into(),
         }
     }
+
+    pub fn css() -> Self {
+        Self {
+            name: "Content-Type".into(),
+            value: "text/css; charset=UTF-8".into(),
+        }
+    }
+
     pub fn javascript() -> Self {
         Self {
             name: "Content-Type".into(),

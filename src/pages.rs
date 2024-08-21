@@ -1,9 +1,11 @@
 mod error_404;
 mod root;
+mod styles_css;
 
 use std::borrow::Cow;
 
 use h10::http::{request::Request, result::H10LibError, status_code::StatusCode, version::Version};
+use styles_css::styles_css;
 
 use crate::{
     server::{CliHttp10StrictMode, ServerResponse},
@@ -38,6 +40,7 @@ impl<'a> Endpoint {
             .and_then(|path| match &*path {
                 "" => root().ok(),
                 "/" => root().ok(),
+                "/assets/styles.css" => styles_css().ok(),
                 _ => Some(error_404()),
             })
             .or_else(|| root().ok())
