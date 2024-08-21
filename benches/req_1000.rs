@@ -1,44 +1,23 @@
 use html_rs as _;
 
-use std::sync::{Arc, Condvar, Mutex};
 use std::thread;
 
 fn main() {
-    let pair = Arc::new((Mutex::new(false), Condvar::new()));
-
     let num_of_requests = 10;
-    let num_of_rounds = 10;
+    let num_of_rounds = 100;
     let mut cur_round = 0;
     while cur_round < num_of_rounds {
-        next_wave(&pair, num_of_requests);
-
-        dbg!("");
-        // Wait for the thread to start up.
-        let (lock, cvar) = &*pair;
-        let mut started = lock.lock().unwrap();
-        // As long as the value inside the `Mutex<bool>` is `false`, we wait.
-        dbg!("");
-        while !*started {
-            dbg!("");
-
-            started = cvar.wait(started).unwrap();
-        }
+        println!("Round: [{}]", cur_round + 1);
+        next_wave(num_of_requests);
         cur_round += 1;
-        dbg!(cur_round);
     }
 }
 
-fn next_wave(pair: &Arc<(Mutex<bool>, Condvar)>, num_of_requests: usize) {
+fn next_wave(num_of_requests: usize) {
     for i in 0..num_of_requests {
-        let pair2 = Arc::clone(pair);
         thread::spawn(move || {
-            let (lock, cvar) = &*pair2;
-            println!("Inside Thread");
-            let mut started = lock.lock().unwrap();
+            println!("Req #{}", i + 1);
             request();
-            *started = true;
-            // We notify the condvar that the value has changed.
-            cvar.notify_one();
         });
     }
 }
