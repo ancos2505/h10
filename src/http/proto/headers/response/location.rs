@@ -2,7 +2,7 @@ use crate::http::proto::headers::{HttpHeader, IntoHeader};
 
 /// ### Location header
 /// Related: Indicate a redirection
-/// 
+///
 /// Reference: https://www.rfc-editor.org/rfc/rfc1945.html#section-10.11
 #[derive(Debug, PartialEq, Eq)]
 pub(crate) struct Location {

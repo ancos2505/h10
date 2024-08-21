@@ -2,7 +2,7 @@ use crate::http::proto::headers::{HttpHeader, IntoHeader};
 
 /// ### Server header
 /// Related: Server/2.14 Library/3.57
-/// 
+///
 /// Reference: https://www.rfc-editor.org/rfc/rfc1945.html#section-10.14
 #[derive(Debug, PartialEq, Eq)]
 pub(crate) struct Server {

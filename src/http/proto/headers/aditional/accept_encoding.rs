@@ -3,13 +3,13 @@ use crate::http::proto::headers::{HttpHeader, IntoHeader};
 /// ### Accept-Encoding
 /// Related: Content handling
 ///
-///  The Accept-Encoding request-header field is similar to Accept, but 
+///  The Accept-Encoding request-header field is similar to Accept, but
 /// restricts the content-coding values which are acceptable in the response.
 ///
 /// Reference: https://www.rfc-editor.org/rfc/rfc1945.html#appendix-D.2.3
 ///
 
-pub(crate) struct AcceptEncoding  {
+pub(crate) struct AcceptEncoding {
     name: String,
     value: String,
 }

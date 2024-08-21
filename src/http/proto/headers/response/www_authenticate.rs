@@ -2,7 +2,7 @@ use crate::http::proto::headers::{HttpHeader, IntoHeader};
 
 /// ### WWW-Authenticate header
 /// Related: Authentication/Authorization/Session
-/// 
+///
 /// Reference: https://www.rfc-editor.org/rfc/rfc1945.html#section-10.16
 #[derive(Debug, PartialEq, Eq)]
 pub(crate) struct WWWAuthenticate {

@@ -1,4 +1,8 @@
-use std::{collections::BTreeMap, fmt::{Debug, Display}, str::FromStr};
+use std::{
+    collections::BTreeMap,
+    fmt::{Debug, Display},
+    str::FromStr,
+};
 
 use html_rs::Html;
 

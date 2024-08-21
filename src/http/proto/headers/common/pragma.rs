@@ -2,7 +2,7 @@ use crate::http::proto::headers::{HttpHeader, IntoHeader};
 
 /// ### Pragma - header
 /// Related: Content state
-/// 
+///
 /// Reference: https://www.rfc-editor.org/rfc/rfc1945.html#section-10.12
 #[derive(Debug, PartialEq, Eq)]
 pub(crate) struct Pragma {
@@ -24,4 +24,3 @@ impl IntoHeader for Pragma {
         HttpHeader { name, value }
     }
 }
-

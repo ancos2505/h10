@@ -1,4 +1,7 @@
-use crate::{http::proto::headers::{HttpHeader, IntoHeader}, result::ServerResult};
+use crate::{
+    http::proto::headers::{HttpHeader, IntoHeader},
+    result::ServerResult,
+};
 
 /// ### Date header
 /// The unix epoch format it is intentional for standardized parsing between
