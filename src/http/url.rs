@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use crate::http::result::{H10LibError, H10LibResult};
 
 const URL_PARTS_MAX_CHARS: usize = 1024;
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct UrlParts {
     pub path: Option<String>,
     query: Option<BTreeMap<String, String>>,

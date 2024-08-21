@@ -2,7 +2,7 @@
 edition = "2021"
 rust-version = "1.80.1"
 name = "h10"
-version = "0.2.0"
+version = "0.3.0"
 description = "Simple HTTP/1.0 Server"
 readme = "README.md"
 keywords = ["html"]

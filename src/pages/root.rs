@@ -5,12 +5,13 @@ use html_rs::{
 
 use h10::http::{
     headers::{ContentType, Date, Pragma, Server},
-    response::Response,
     result::H10LibResult,
     status_code::StatusCode,
 };
 
-pub fn root() -> H10LibResult<Response> {
+use crate::server::ServerResponse;
+
+pub fn root() -> H10LibResult<ServerResponse> {
     let html = Html::builder()
         .head_item(Title::builder().append_child(TextContent::text("It works!")))
         .head_item(Meta::builder().attr("charset", "utf-8"))
@@ -25,7 +26,7 @@ pub fn root() -> H10LibResult<Response> {
     #[cfg(feature = "debug")]
     dbg!(&html);
 
-    Ok(Response::new(StatusCode::OK)
+    Ok(ServerResponse::new(StatusCode::OK)
         .header(ContentType::html())
         .header(Date::now()?)
         .header(Server::default())

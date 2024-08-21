@@ -1,30 +1,32 @@
 use std::{borrow::Cow, collections::BTreeMap};
 
-use crate::http::result::{H10LibError, H10LibResult};
+use crate::{
+    http::result::{H10LibError, H10LibResult},
+    MAX_REQUEST_LENGTH,
+};
 
 use super::{method::Method, url::UrlParts, version::Version};
-
-const TEN_MEGABYTES: usize = 1024 * 1024 * 10;
 
 // TODO: Optimize data types to fast fields parsing
 #[derive(Debug, Default)]
 pub struct Request<'a> {
-    http_version: Option<Version>,
-    method: Option<Method>,
-    pub path: Option<UrlParts>,
+    pub http_version: Version,
+    method: Method,
+    pub url_parts: UrlParts,
     // TODO
     headers: Option<BTreeMap<&'a str, &'a str>>,
     // TODO
     body: Option<Body<'a>>,
 }
-impl<'a> Request<'a> {
-    pub fn parse(input: Cow<'a, str>) -> H10LibResult<Self> {
-        if input.len() > TEN_MEGABYTES {
-            return Err(H10LibError::InvalidInputData(
-                "Request is larger than 10 MBytes".into(),
-            ));
+impl Request<'_> {
+    pub fn parse<S: AsRef<str>>(to_s: S) -> H10LibResult<Self> {
+        let input = to_s.as_ref();
+        if input.len() > MAX_REQUEST_LENGTH {
+            return Err(H10LibError::InvalidInputData(format!(
+                "Request size is larger than expected. MAX: {} Bytes",
+                MAX_REQUEST_LENGTH
+            )));
         }
-        let mut request = Request::default();
 
         let preamble = input
             .split("\r\n")
@@ -42,9 +44,14 @@ impl<'a> Request<'a> {
 
         let version_str = iter.next().ok_or(H10LibError::VersionNotSupported)?;
 
-        request.method = Some(method_str.parse::<Method>()?);
-        request.path = Some(UrlParts::parse(path_str)?);
-        request.http_version = Some(version_str.parse::<Version>()?);
+        let request = Self {
+            http_version: version_str.parse::<Version>()?,
+            method: method_str.parse::<Method>()?,
+            url_parts: UrlParts::parse(path_str)?,
+            headers: Default::default(),
+            // TODO
+            body: Default::default(),
+        };
 
         Ok(request)
     }

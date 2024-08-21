@@ -22,7 +22,7 @@ fn main() {
             started = cvar.wait(started).unwrap();
         }
         cur_round += 1;
-        dbg!(cur_round);
+        // dbg!(cur_round);
     }
 }
 

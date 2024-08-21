@@ -4,11 +4,28 @@ Simple HTTP/1.0 Server with no external dependencies (WIP)
 
 ## Getting Started
 
-### Terminal 1
+
+### Installation
+```
+cargo install h10
+```
+
+### Installed mode
+```
+./h10-server --http1.0 --ip-address=127.0.0.1 --port=9000 
+```
+or 
+```
+./h10-server --help
+```
+
+### Dev mode
+
+#### Terminal 1
 ```
 cargo run
 ```
-### Terminal 2
+#### Terminal 2
 ```
 curl -v localhost:8080
 ```

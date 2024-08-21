@@ -4,12 +4,13 @@ use html_rs::{
 };
 
 use h10::http::{
-    headers::{ContentType, Date, Pragma, Server},
-    response::Response,
+    headers::{ContentType, Pragma, Server},
     status_code::StatusCode,
 };
 
-pub fn error_404() -> Response {
+use crate::server::ServerResponse;
+
+pub fn error_404() -> ServerResponse {
     let html = Html::builder()
         .head_item(Title::builder().append_child(TextContent::text("Not Found")))
         .head_item(Meta::builder().attr("charset", "utf-8"))
@@ -24,7 +25,7 @@ pub fn error_404() -> Response {
     #[cfg(feature = "debug")]
     dbg!(&html);
 
-    Response::new(StatusCode::NotFound)
+    ServerResponse::new(StatusCode::NotFound)
         .header(ContentType::html())
         .header(Server::default())
         .header(Pragma::default())

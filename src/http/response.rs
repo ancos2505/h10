@@ -9,7 +9,7 @@ use html_rs::Html;
 use crate::http::result::H10LibError;
 
 use super::{
-    headers::{HttpHeader, IntoHeader},
+    headers::{Connection, HttpHeader, IntoHeader},
     status_code::StatusCode,
     version::Version,
 };
@@ -19,7 +19,7 @@ pub const URL_MAX_LENGTH: usize = 4096;
 #[derive(Debug)]
 pub struct Response {
     http_version: Version,
-    status: StatusCode,
+    pub status: StatusCode,
     headers: BTreeMap<String, String>,
     body: Option<String>,
 }
@@ -49,31 +49,31 @@ impl Display for Response {
     }
 }
 impl Response {
-    pub fn new(status: StatusCode) -> Response {
-        Response {
+    pub fn new(status: StatusCode) -> Self {
+        Self {
             http_version: Default::default(),
             status,
             headers: Default::default(),
             body: Default::default(),
         }
     }
-    pub fn header<H: IntoHeader>(mut self, header: H) -> Response {
+    pub fn header<H: IntoHeader>(mut self, header: H) -> Self {
         let HttpHeader { name, value } = header.into_header();
         self.headers.insert(name, value);
-        Response {
+        Self {
             http_version: self.http_version,
             status: self.status,
             headers: self.headers,
             body: self.body,
         }
     }
-    pub fn body<B: ToString>(self, body: B) -> Response {
+    pub fn body<B: ToString>(self, body: B) -> Self {
         use crate::http::headers::ContentLength;
         let body = body.to_string();
 
         let response = self.header(ContentLength::length(body.len() + 4));
 
-        Response {
+        Self {
             http_version: response.http_version,
             status: response.status,
             headers: response.headers,

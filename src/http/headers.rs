@@ -1,5 +1,6 @@
 mod aditional;
 mod common;
+mod compat;
 mod entity;
 mod request;
 mod response;
@@ -12,6 +13,7 @@ pub use self::{
         RetryAfter, Title, URI,
     },
     common::{Date, Pragma},
+    compat::Connection,
     entity::{Allow, ContentEncoding, ContentLength, ContentType, Expires, LastModified},
     request::{Authorization, From, IfModifiedSince, Referer, UserAgent},
     response::{Location, Server, WWWAuthenticate},

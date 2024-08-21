@@ -6,6 +6,8 @@ use std::{
     time::SystemTimeError,
 };
 
+use super::status_code::StatusCode;
+
 pub type H10LibResult<T> = Result<T, H10LibError>;
 
 #[derive(Debug)]
@@ -51,3 +53,18 @@ impl Display for H10LibError {
 }
 
 impl Error for H10LibError {}
+
+impl From<H10LibError> for StatusCode {
+    fn from(value: H10LibError) -> Self {
+        match value {
+            H10LibError::MethodNotSupported
+            | H10LibError::InvalidInputData(_)
+            | H10LibError::VersionNotSupported => StatusCode::BadRequest,
+            H10LibError::ParseFloatError(_) => StatusCode::InternalServerError,
+            H10LibError::SystemTimeError(_) => StatusCode::InternalServerError,
+            H10LibError::ParseIntError(_) => StatusCode::InternalServerError,
+            H10LibError::IoError(_) => StatusCode::InternalServerError,
+            H10LibError::Custom(_) => StatusCode::InternalServerError,
+        }
+    }
+}
