@@ -2,7 +2,7 @@
 edition = "2021"
 rust-version = "1.80.1"
 name = "h10"
-version = "0.1.12"
+version = "0.2.0"
 description = "Simple HTTP/1.0 Server"
 readme = "README.md"
 keywords = ["html"]
@@ -15,6 +15,13 @@ categories = [
 license = "MIT"
 repository = "https://github.com/ancos2505/h10"
 
+[lib]
+name = "h10"
+path = "src/lib.rs"
+
+[[bin]]
+name = "h10-server"
+path = "src/main.rs"
 
 [dependencies]
 html-rs = "0.3"
@@ -72,7 +79,7 @@ unit-bindings = "forbid"
 unnameable-types = "forbid"
 unsafe-op-in-unsafe-fn = "forbid"
 unstable-features = "forbid"
-unused-crate-dependencies = "forbid"
+# unused-crate-dependencies = "allow"
 unused-extern-crates = "forbid"
 unused-import-braces = "forbid"
 unused-lifetimes = "forbid"

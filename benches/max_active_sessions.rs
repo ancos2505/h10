@@ -1,5 +1,3 @@
-use html_rs as _;
-
 use std::sync::{Arc, Condvar, Mutex};
 use std::thread;
 
