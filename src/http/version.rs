@@ -8,15 +8,18 @@ pub enum Version {
     Http1_0,
     Http1_1,
 }
+
+impl Version {
+    pub const fn as_str(&self) -> &'static str {
+        match self {
+            Version::Http1_0 => "HTTP/1.0",
+            Version::Http1_1 => "HTTP/1.0",
+        }
+    }
+}
 impl Display for Version {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut output = "".to_owned();
-        output.push_str("HTTP/");
-        match self {
-            Version::Http1_0 => output.push_str("1.0"),
-            Version::Http1_1 => output.push_str("1.1"),
-        };
-        write!(f, "{}", output)
+        write!(f, "{}", self.as_str())
     }
 }
 

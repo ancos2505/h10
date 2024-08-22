@@ -1,8 +1,12 @@
+pub mod parser;
+#[cfg(test)]
+mod tests;
+
 use std::{collections::BTreeMap, str::FromStr};
 
 use crate::{
+    constants::MAX_REQUEST_LENGTH,
     http::result::{H10LibError, H10LibResult},
-    MAX_REQUEST_LENGTH,
 };
 
 use super::{method::Method, url::UrlParts, version::Version};

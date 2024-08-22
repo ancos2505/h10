@@ -20,6 +20,7 @@ pub enum H10LibError {
     SystemTimeError(SystemTimeError),
     ParseIntError(ParseIntError),
     FromUtf8Error,
+    RequestParser(String),
     IoError(IoError),
     Custom(String),
 }
@@ -65,6 +66,7 @@ impl From<H10LibError> for StatusCode {
     fn from(value: H10LibError) -> Self {
         match value {
             H10LibError::MethodNotSupported
+            | H10LibError::RequestParser(_)
             | H10LibError::InvalidInputData(_)
             | H10LibError::VersionNotSupported => StatusCode::BadRequest,
             H10LibError::ParseFloatError(_)

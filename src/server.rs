@@ -14,14 +14,11 @@ use std::{
 
 pub(crate) use self::cli::CliHttp10StrictMode;
 use self::cli::CliVerboseMode;
-use h10::{
-    http::{
-        headers::{Connection, IntoHeader},
-        response::Response,
-        result::{H10LibError, H10LibResult},
-        status_code::StatusCode,
-    },
-    FOUR_KBYTES,
+use h10::http::{
+    headers::{Connection, IntoHeader},
+    response::Response,
+    result::{H10LibError, H10LibResult},
+    status_code::StatusCode,
 };
 
 use self::cli::CliIpAddress;
@@ -33,7 +30,7 @@ pub(crate) use self::{
     traits::IntoResponse,
 };
 
-use crate::{pages::Endpoint, CLI_ARGS, HTTP10_STRICT_MODE};
+use crate::{pages::Endpoint, CLI_ARGS, FOUR_KBYTES, HTTP10_STRICT_MODE, MAX_ACTIVE_SESSIONS};
 
 pub(crate) struct ServerResponse(Response);
 impl ServerResponse {
@@ -61,7 +58,7 @@ impl IntoResponse for ServerResponse {
 pub(crate) struct HttpServer;
 impl HttpServer {
     const CHUNK_SIZE: usize = FOUR_KBYTES;
-    const MAX_ACTIVE_SESSIONS: usize = 5_000;
+
     fn listener(cli_data: &Cli) -> String {
         format!("{}:{}", cli_data.ip_address, cli_data.port)
     }
@@ -148,7 +145,7 @@ impl HttpServer {
         };
 
         let response_str = if let Some(sessions) = opened_sessions {
-            if sessions < Self::MAX_ACTIVE_SESSIONS {
+            if sessions < MAX_ACTIVE_SESSIONS {
                 match act_session.try_lock() {
                     Ok(mut data) => {
                         // dbg!(*data);
@@ -206,7 +203,7 @@ impl HttpServer {
                     }
                 }
 
-                Ok(Endpoint::dispatcher(&req_str))
+                Ok(Endpoint::dispatcher(req_str))
             }
             Err(err) => {
                 println!("Unable to read stream: {}", err);

@@ -1,4 +1,4 @@
-use std::{default, fmt::Display, str::FromStr};
+use std::{fmt::Display, str::FromStr};
 
 use crate::http::result::H10LibError;
 
@@ -20,6 +20,19 @@ pub enum Method {
     Unlink,
 }
 
+impl Method {
+    pub const fn as_str(&self) -> &'static str {
+        match self {
+            Self::Get => "GET",
+            Self::Head => "HEAD",
+            Self::Post => "POST",
+            Self::Put => "PUT",
+            Self::Delete => "DELETE",
+            Self::Link => "LINK",
+            Self::Unlink => "UNLINK",
+        }
+    }
+}
 impl FromStr for Method {
     type Err = H10LibError;
 
@@ -40,15 +53,6 @@ impl FromStr for Method {
 
 impl Display for Method {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let output = match self {
-            Self::Get => "GET".to_owned(),
-            Self::Head => "HEAD".to_owned(),
-            Self::Post => "POST".to_owned(),
-            Self::Put => "PUT".to_owned(),
-            Self::Delete => "DELETE".to_owned(),
-            Self::Link => "LINK".to_owned(),
-            Self::Unlink => "UNLINK".to_owned(),
-        };
-        write!(f, "{output}")
+        write!(f, "{}", self.as_str())
     }
 }

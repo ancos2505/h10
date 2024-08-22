@@ -6,15 +6,13 @@ use std::{
 
 use html_rs::Html;
 
-use crate::http::result::H10LibError;
+use crate::{constants::URL_MAX_LENGTH, http::result::H10LibError};
 
 use super::{
     headers::{HttpHeader, IntoHeader},
     status_code::StatusCode,
     version::Version,
 };
-
-pub const URL_MAX_LENGTH: usize = 4096;
 
 #[derive(Debug)]
 pub struct Response {
