@@ -1,32 +1,73 @@
+use std::sync::atomic::Ordering;
+
 use html_rs::{
-    elements::{Button, Div, ElementBuilder, Link, Meta, TextContent, Title, H1},
+    elements::{Button, Div, ElementBuilder, Form, Input, Link, Meta, TextContent, Title, H1, P},
     Html, HtmlBody,
 };
 
 use h10::http::{
-    headers::{ContentType, Date, Pragma, Server},
+    headers::{ContentType, Date, HttpHeader, Location, Pragma, Server},
+    request::Request,
     result::H10LibResult,
     status_code::StatusCode,
 };
 
-use crate::server::ServerResponse;
+use crate::{server::ServerResponse, ROOT_PAGER_COUNTER};
 
-pub fn root() -> H10LibResult<ServerResponse> {
-    let card = Div::builder().attr("class", "card").append_child(
-        Button::builder()
-            .attr("id", "counter")
-            .attr("type", "button")
-            // TODO
-            .append_child(TextContent::text("count is 0")),
-    );
+pub fn root(request: Request) -> H10LibResult<ServerResponse> {
+    dbg!(&request);
+    let maybe_query = request.url_parts.query.and_then(|mut btree_map| {
+        btree_map
+            .remove_entry("endpoint".into())
+            .map(|(_, value)| value)
+    });
+    if let Some(query) = maybe_query {
+        match &*query {
+            "counter" => {
+                let _ = ROOT_PAGER_COUNTER.fetch_add(1, Ordering::SeqCst);
+                return Ok(ServerResponse::new(StatusCode::MovedTemporarily)
+                    .header(Location::from_str("/")?));
+            }
+            _ => (),
+        }
+    }
+
+    let current_counter = ROOT_PAGER_COUNTER.load(Ordering::SeqCst);
+
+    let favicon_disabled = Link::builder()
+        .attr("rel", "shortcut icon")
+        .attr("href", "data:image/x-icon;,")
+        .attr("type", "image/x-icon");
+    let form = Form::builder()
+        .attr("action", "")
+        .attr("method", "get")
+        .append_child(
+            Input::builder()
+                .attr("type", "hidden")
+                .attr("name", "endpoint")
+                .attr("value", "counter"),
+        )
+        .append_child(
+            Input::builder()
+                .attr("id", "btn-counter")
+                .attr("type", "submit")
+                .attr("value", format!("count is {current_counter}")),
+        );
+    let card = Div::builder().attr("class", "card").append_child(form);
 
     let div = Div::builder().append_child(
         Div::builder()
             .append_child(H1::builder().append_child(TextContent::text("It works!")))
-            .append_child(card),
+            .append_child(card)
+            .append_child(P::builder().append_child(TextContent::text("You can disable <strong>Javascript</strong> in your browser and the app still works!"))),
     );
     let html = Html::builder()
-        .head_item(Title::builder().append_child(TextContent::text(format!("{} v{}",env!("CARGO_PKG_NAME"),env!("CARGO_PKG_VERSION")))))
+        .head_item(favicon_disabled)
+        .head_item(Title::builder().append_child(TextContent::text(format!(
+            "{} v{}",
+            env!("CARGO_PKG_NAME"),
+            env!("CARGO_PKG_VERSION")
+        ))))
         .head_item(Meta::builder().attr("charset", "utf-8"))
         .head_item(
             Meta::builder()

@@ -4,13 +4,14 @@ mod styles_css;
 
 use std::borrow::Cow;
 
-use h10::http::{request::Request, result::H10LibError, status_code::StatusCode, version::Version};
-use styles_css::styles_css;
+use h10::http::{request::Request, result::H10LibError, version::Version};
 
 use crate::{
     server::{CliHttp10StrictMode, ServerResponse},
     CLI_ARGS,
 };
+
+use self::styles_css::styles_css;
 
 pub struct Endpoint;
 
@@ -34,17 +35,16 @@ impl<'a> Endpoint {
             }
         }
 
-        let maybe_response = request
-            .url_parts
-            .path
-            .and_then(|path| match &*path {
-                "" => root().ok(),
-                "/" => root().ok(),
+        let maybe_response = match &request.url_parts.path {
+            Some(path) => match &**path {
+                "" => root(request).ok(),
+                "/" => root(request).ok(),
                 "/assets/styles.css" => styles_css().ok(),
                 _ => Some(error_404()),
-            })
-            .or_else(|| root().ok())
-            .map(|res| res);
+            },
+            None => Some(error_404()),
+        };
+
         if let Some(response) = maybe_response {
             return response;
         } else {

@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, fmt::Display};
 
 use crate::http::result::{H10LibError, H10LibResult};
 
@@ -6,8 +6,32 @@ const URL_PARTS_MAX_CHARS: usize = 1024;
 #[derive(Debug, Default)]
 pub struct UrlParts {
     pub path: Option<String>,
-    query: Option<BTreeMap<String, String>>,
-    fragment: Option<String>,
+    pub query: Option<BTreeMap<String, String>>,
+    pub fragment: Option<String>,
+}
+
+impl Display for UrlParts {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut output = "".to_string();
+
+        if let Some(path) = &self.path {
+            output.push_str(path)
+        }
+
+        if let Some(queries) = &self.query {
+            output.push('?');
+            for (key, value) in queries {
+                output.push_str(format!("{key}={value}").as_str());
+            }
+        }
+
+        if let Some(fragment) = &self.fragment {
+            output.push('#');
+            output.push_str(fragment)
+        }
+
+        write!(f, "{output}")
+    }
 }
 
 impl UrlParts {

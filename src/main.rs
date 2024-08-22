@@ -1,9 +1,12 @@
 mod pages;
 mod server;
 
-use std::sync::OnceLock;
+use std::sync::{atomic::AtomicUsize, OnceLock};
 
 use crate::server::{Cli, HttpServer, ServerResult};
+
+// Unsafe
+static ROOT_PAGER_COUNTER: AtomicUsize = AtomicUsize::new(0);
 
 static HTTP10_STRICT_MODE: OnceLock<bool> = OnceLock::new();
 

@@ -1,5 +1,5 @@
 use html_rs::{
-    elements::{ElementBuilder, Meta, TextContent, Title, H1},
+    elements::{ElementBuilder, Link, Meta, TextContent, Title, H1},
     Html, HtmlBody,
 };
 
@@ -11,8 +11,13 @@ use h10::http::{
 use crate::server::ServerResponse;
 
 pub fn error_404() -> ServerResponse {
+    let favicon_disabled = Link::builder()
+        .attr("rel", "shortcut icon")
+        .attr("href", "data:image/x-icon;,")
+        .attr("type", "image/x-icon");
     let html = Html::builder()
         .head_item(Title::builder().append_child(TextContent::text("Not Found")))
+        .head_item(favicon_disabled)
         .head_item(Meta::builder().attr("charset", "utf-8"))
         .body(
             HtmlBody::builder()
