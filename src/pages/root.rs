@@ -15,7 +15,6 @@ use h10::http::{
 use crate::{server::ServerResponse, ROOT_PAGER_COUNTER};
 
 pub fn root(request: Request) -> H10LibResult<ServerResponse> {
-    dbg!(&request);
     let maybe_query = request.url_parts.query.and_then(|mut btree_map| {
         btree_map
             .remove_entry("endpoint".into())

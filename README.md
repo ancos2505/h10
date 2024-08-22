@@ -27,7 +27,7 @@ The usage of `--http1.0` argument will make the request from browsers return 400
 
 ### Usage
 ```
-h10 (v0.3.0): Simple HTTP/1.0 Server - https://github.com/ancos2505/h10
+h10 (v0.3.4): Simple HTTP/1.0 Server - https://github.com/ancos2505/h10
 
 Usage: h10-server [OPTION]
 
