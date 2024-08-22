@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, str::FromStr};
 
 use crate::{
     http::result::{H10LibError, H10LibResult},
@@ -13,10 +13,8 @@ pub struct Request {
     pub http_version: Version,
     method: Method,
     pub url_parts: UrlParts,
-    // TODO
     headers: Option<BTreeMap<String, String>>,
-    // TODO
-    body: Option<String>,
+    body: Option<Body>,
 }
 impl Request {
     pub fn parse<S: AsRef<str>>(to_s: S) -> H10LibResult<Self> {
@@ -27,13 +25,18 @@ impl Request {
                 MAX_REQUEST_LENGTH
             )));
         }
-        let mut raw_request = input.split("\r\n");
+        let mut raw_request = input.split("\r\n\r\n");
 
-        let raw_method_line = raw_request.next().ok_or(H10LibError::InvalidInputData(
-            "HTTP Preamble not found".into(),
+        let headers = raw_request.next().ok_or(H10LibError::InvalidInputData(
+            "HTTP headers not found".into(),
         ))?;
 
-        let mut iter = raw_method_line.split(" ");
+        let mut iter_headers = headers.split("\r\n");
+
+        let method_line = iter_headers.next().ok_or(H10LibError::InvalidInputData(
+            "HTTP headers not found".into(),
+        ))?;
+        let mut iter = method_line.split(" ");
         let method_str = iter.next().ok_or(H10LibError::MethodNotSupported)?;
 
         let path_str = iter
@@ -42,7 +45,7 @@ impl Request {
 
         let version_str = iter.next().ok_or(H10LibError::VersionNotSupported)?;
 
-        let headers = raw_request.next().map(|raw_headers| {
+        let headers = iter_headers.next().map(|raw_headers| {
             raw_headers
                 .lines()
                 .map(|line| {
@@ -55,7 +58,11 @@ impl Request {
                 .collect()
         });
 
-        let body = raw_request.next().map(|s| s.to_string());
+        let body = if let Some(raw_body) = raw_request.next() {
+            Some(raw_body.parse::<Body>()?)
+        } else {
+            None
+        };
 
         let request = Self {
             http_version: version_str.parse::<Version>()?,
@@ -66,5 +73,22 @@ impl Request {
         };
 
         Ok(request)
+    }
+}
+
+/// ### Request Body
+/// Should compilant with RFC 1867 - Form-based File Upload in HTML
+///
+/// Reference: https://www.rfc-editor.org/rfc/rfc1867
+///
+#[derive(Debug, PartialEq, Eq)]
+pub struct Body(String);
+
+impl FromStr for Body {
+    type Err = H10LibError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let collected: String = s.chars().filter(|c| *c as u8 != 0).collect();
+        Ok(Self(collected.to_owned()))
     }
 }

@@ -9,7 +9,7 @@ use html_rs::Html;
 use crate::http::result::H10LibError;
 
 use super::{
-    headers::{Connection, HttpHeader, IntoHeader},
+    headers::{HttpHeader, IntoHeader},
     status_code::StatusCode,
     version::Version,
 };

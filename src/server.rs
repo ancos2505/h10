@@ -206,7 +206,7 @@ impl HttpServer {
                     }
                 }
 
-                Ok(Endpoint::dispatcher(req_str))
+                Ok(Endpoint::dispatcher(&req_str))
             }
             Err(err) => {
                 println!("Unable to read stream: {}", err);

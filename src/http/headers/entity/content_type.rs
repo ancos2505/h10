@@ -51,6 +51,12 @@ impl ContentType {
             value: "application/json; charset=UTF-8".into(),
         }
     }
+    pub fn form_url_encoded() -> Self {
+        Self {
+            name: "Content-Type".into(),
+            value: "application/x-www-form-urlencoded".into(),
+        }
+    }
 }
 
 impl IntoHeader for ContentType {

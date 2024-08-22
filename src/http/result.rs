@@ -3,6 +3,7 @@ use std::{
     fmt::Display,
     io::Error as IoError,
     num::{ParseFloatError, ParseIntError},
+    string::FromUtf8Error,
     time::SystemTimeError,
 };
 
@@ -18,10 +19,16 @@ pub enum H10LibError {
     ParseFloatError(ParseFloatError),
     SystemTimeError(SystemTimeError),
     ParseIntError(ParseIntError),
+    FromUtf8Error,
     IoError(IoError),
     Custom(String),
 }
 
+impl From<FromUtf8Error> for H10LibError {
+    fn from(_: FromUtf8Error) -> Self {
+        Self::FromUtf8Error
+    }
+}
 impl From<ParseFloatError> for H10LibError {
     fn from(error: ParseFloatError) -> Self {
         Self::ParseFloatError(error)
@@ -60,11 +67,12 @@ impl From<H10LibError> for StatusCode {
             H10LibError::MethodNotSupported
             | H10LibError::InvalidInputData(_)
             | H10LibError::VersionNotSupported => StatusCode::BadRequest,
-            H10LibError::ParseFloatError(_) => StatusCode::InternalServerError,
-            H10LibError::SystemTimeError(_) => StatusCode::InternalServerError,
-            H10LibError::ParseIntError(_) => StatusCode::InternalServerError,
-            H10LibError::IoError(_) => StatusCode::InternalServerError,
-            H10LibError::Custom(_) => StatusCode::InternalServerError,
+            H10LibError::ParseFloatError(_)
+            | H10LibError::SystemTimeError(_)
+            | H10LibError::ParseIntError(_)
+            | H10LibError::IoError(_)
+            | H10LibError::Custom(_)
+            | H10LibError::FromUtf8Error => StatusCode::InternalServerError,
         }
     }
 }

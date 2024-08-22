@@ -2,8 +2,6 @@ mod error_404;
 mod root;
 mod styles_css;
 
-use std::borrow::Cow;
-
 use h10::http::{request::Request, result::H10LibError, version::Version};
 
 use crate::{
@@ -15,8 +13,8 @@ use self::styles_css::styles_css;
 
 pub struct Endpoint;
 
-impl<'a> Endpoint {
-    pub fn dispatcher(request_str: Cow<'a, str>) -> ServerResponse {
+impl Endpoint {
+    pub fn dispatcher(request_str: &str) -> ServerResponse {
         use super::pages::{error_404::error_404, root::root};
         let request = match Request::parse(&request_str) {
             Ok(req) => req,
