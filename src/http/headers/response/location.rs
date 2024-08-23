@@ -1,7 +1,7 @@
 use crate::http::{
     headers::{HttpHeader, IntoHeader},
     result::H10LibResult,
-    url::UrlParts,
+    url_parts::UrlParts2,
 };
 
 /// ### Location header
@@ -17,7 +17,7 @@ impl Location {
     pub fn from_str<S: AsRef<str>>(url: S) -> H10LibResult<Self> {
         Ok(Self {
             name: "Location".into(),
-            value: UrlParts::parse(url.as_ref())?.to_string(),
+            value: UrlParts2::parse(url.as_ref())?.to_string(),
         })
     }
 }

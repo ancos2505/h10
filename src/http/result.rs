@@ -3,6 +3,7 @@ use std::{
     fmt::Display,
     io::Error as IoError,
     num::{ParseFloatError, ParseIntError},
+    str::Utf8Error,
     string::FromUtf8Error,
     time::SystemTimeError,
 };
@@ -20,6 +21,7 @@ pub enum H10LibError {
     SystemTimeError(SystemTimeError),
     ParseIntError(ParseIntError),
     FromUtf8Error,
+    Utf8Error,
     RequestParser(String),
     IoError(IoError),
     Custom(String),
@@ -30,6 +32,13 @@ impl From<FromUtf8Error> for H10LibError {
         Self::FromUtf8Error
     }
 }
+
+impl From<Utf8Error> for H10LibError {
+    fn from(_: Utf8Error) -> Self {
+        Self::Utf8Error
+    }
+}
+
 impl From<ParseFloatError> for H10LibError {
     fn from(error: ParseFloatError) -> Self {
         Self::ParseFloatError(error)
@@ -68,6 +77,7 @@ impl From<H10LibError> for StatusCode {
             H10LibError::MethodNotSupported
             | H10LibError::RequestParser(_)
             | H10LibError::InvalidInputData(_)
+            | H10LibError::Utf8Error
             | H10LibError::VersionNotSupported => StatusCode::BadRequest,
             H10LibError::ParseFloatError(_)
             | H10LibError::SystemTimeError(_)

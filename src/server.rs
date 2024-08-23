@@ -3,6 +3,7 @@ mod log;
 mod result;
 mod traits;
 
+use core::str;
 use std::{
     collections::BTreeMap,
     io::{Read, Write},
@@ -12,8 +13,8 @@ use std::{
     time::{Duration, Instant},
 };
 
-pub(crate) use self::cli::CliHttp10StrictMode;
-use self::cli::CliVerboseMode;
+pub(crate) use self::cli::{CliHttp10StrictMode, CliVerboseMode};
+
 use h10::http::{
     headers::{Connection, IntoHeader},
     response::Response,
@@ -57,7 +58,9 @@ impl IntoResponse for ServerResponse {
 
 pub(crate) struct HttpServer;
 impl HttpServer {
-    const CHUNK_SIZE: usize = FOUR_KBYTES;
+    // const CHUNK_SIZE: usize = FOUR_KBYTES;
+    // ! REMOVE
+    const CHUNK_SIZE: usize = 1024;
 
     fn listener(cli_data: &Cli) -> String {
         format!("{}:{}", cli_data.ip_address, cli_data.port)
@@ -194,16 +197,12 @@ impl HttpServer {
         let mut buf = [0u8; Self::CHUNK_SIZE];
         match stream.read(&mut buf) {
             Ok(bytes) => {
-                // TODO
-                let req_str = String::from_utf8_lossy(&buf);
                 if let Some(cli_data) = CLI_ARGS.get() {
                     if cli_data.verbose == CliVerboseMode::Enabled {
                         println!("Request received: {bytes} Bytes.");
-                        println!("{}", req_str);
                     }
                 }
-
-                Ok(Endpoint::dispatcher(req_str))
+                Ok(Endpoint::dispatcher(&buf))
             }
             Err(err) => {
                 println!("Unable to read stream: {}", err);

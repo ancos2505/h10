@@ -21,6 +21,8 @@ pub enum Method {
 }
 
 impl Method {
+    pub const MAX_LENGTH: usize = 6;
+
     pub const fn as_str(&self) -> &'static str {
         match self {
             Self::Get => "GET",

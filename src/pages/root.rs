@@ -7,7 +7,7 @@ use html_rs::{
 
 use h10::http::{
     headers::{ContentType, Date, Location, Pragma, Server},
-    request::parser::RequestParsed,
+    request::old_parser::RequestParsed,
     result::H10LibResult,
     status_code::StatusCode,
 };

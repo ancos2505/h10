@@ -5,7 +5,7 @@ use crate::{
     http::{
         method::Method,
         result::{H10LibError, H10LibResult},
-        url::UrlParts,
+        url_parts::UrlParts2,
         version::Version,
     },
 };
@@ -16,7 +16,7 @@ pub struct RequestParsed<'a> {
     pub http_version: Option<Version>,
     method: Option<Method>,
     // pub url: Option<UrlPartsParsed<'a>>,
-    pub url: Option<UrlParts>,
+    pub url: Option<UrlParts2>,
     headers: Option<Headers<'a>>,
     body: Option<BodyParsed<'a>>,
 }
@@ -253,11 +253,11 @@ impl<'a> RequestParser<'a, AfterMethod> {
                 let s = maybe_url_str
                     .ok_or_else(|| H10LibError::RequestParser("Url not found".to_string()))?;
                 // TODO
-                UrlParts::parse(s)?
+                UrlParts2::parse(s)?
             } else {
                 return Err(H10LibError::RequestParser(format!(
                     "Expected `{}`",
-                    stringify!(UrlParts)
+                    stringify!(UrlParts2)
                 )));
             }
         };

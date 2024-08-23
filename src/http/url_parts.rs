@@ -6,12 +6,13 @@ use crate::{
 };
 
 #[derive(Debug, Default)]
-pub struct UrlParts {
+pub struct UrlParts2 {
     pub path: Option<String>,
     pub query: Option<BTreeMap<String, String>>,
+    pub fragment: Option<String>,
 }
 
-impl Display for UrlParts {
+impl Display for UrlParts2 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut output = "".to_string();
 
@@ -26,12 +27,17 @@ impl Display for UrlParts {
             }
         }
 
+        if let Some(fragment) = &self.fragment {
+            output.push('#');
+            output.push_str(fragment)
+        }
+
         write!(f, "{output}")
     }
 }
 
-impl UrlParts {
-    pub fn parse(input: &str) -> H10LibResult<UrlParts> {
+impl UrlParts2 {
+    pub fn parse(input: &str) -> H10LibResult<UrlParts2> {
         if input.chars().count() < URL_PARTS_MAX_CHARS {
             let maybe_path = input
                 .split('#')
@@ -41,6 +47,10 @@ impl UrlParts {
                 .filter(|s| !s.is_empty());
 
             let mut queries_string = BTreeMap::new();
+
+            let maybe_fragment = input
+                .split_once('#')
+                .map(|(_, fragment)| fragment.to_string());
 
             {
                 let maybe_query_string =
@@ -62,13 +72,14 @@ impl UrlParts {
                     }
                 }
             }
-            Ok(UrlParts {
+            Ok(UrlParts2 {
                 path: maybe_path,
                 query: if queries_string.len() > 0 {
                     Some(queries_string)
                 } else {
                     None
                 },
+                fragment: maybe_fragment,
             })
         } else {
             Err(H10LibError::InvalidInputData(
@@ -84,7 +95,7 @@ mod tests {
     #[test]
     fn ok_on_parse_url_parts() -> H10LibResult<()> {
         let url = "/path/to/resource?key1=value1&key2=value2#section1";
-        let parts = UrlParts::parse(url);
+        let parts = UrlParts2::parse(url);
         println!("{:#?}", parts);
 
         assert!(parts.is_ok());
@@ -97,7 +108,7 @@ mod tests {
         let mut idx = 0;
         while let Some(s) = url.split_at_checked(idx).map(|(s, _)| s) {
             idx += 1;
-            let parts = UrlParts::parse(s);
+            let parts = UrlParts2::parse(s);
             println!("{:#?}", parts);
             assert!(parts.is_ok())
         }

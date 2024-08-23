@@ -5,4 +5,5 @@ pub mod response;
 pub mod result;
 pub mod status_code;
 pub mod url;
+pub mod url_parts;
 pub mod version;

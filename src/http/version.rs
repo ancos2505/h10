@@ -10,10 +10,11 @@ pub enum Version {
 }
 
 impl Version {
+    pub const MAX_LENGTH: usize = 8;
     pub const fn as_str(&self) -> &'static str {
         match self {
             Version::Http1_0 => "HTTP/1.0",
-            Version::Http1_1 => "HTTP/1.0",
+            Version::Http1_1 => "HTTP/1.1",
         }
     }
 }

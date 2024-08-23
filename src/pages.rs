@@ -2,16 +2,16 @@ mod error_404;
 mod root;
 mod styles_css;
 
-use std::borrow::Cow;
+use std::{borrow::Cow, cell::RefCell, rc::Rc, str::Utf8Error};
 
 use h10::http::{
-    request::{parser::RequestParser, Request},
+    request::{old_parser::RequestParser, Request},
     result::H10LibError,
     version::Version,
 };
 
 use crate::{
-    server::{CliHttp10StrictMode, ServerResponse},
+    server::{CliHttp10StrictMode, CliVerboseMode, ServerResponse},
     CLI_ARGS,
 };
 
@@ -19,11 +19,32 @@ use self::styles_css::styles_css;
 
 pub struct Endpoint;
 
-impl<'a> Endpoint {
-    pub fn dispatcher(request_str: Cow<'a, str>) -> ServerResponse {
+impl Endpoint {
+    pub fn dispatcher(raw_request: &[u8]) -> ServerResponse {
         use super::pages::{error_404::error_404, root::root};
+        use std::str;
 
-        let mut parser = RequestParser::new(request_str)
+        // TODO
+        let req = match Request::parse(raw_request) {
+            Ok(req) => req,
+            Err(err) => {
+                dbg!(&err);
+                return ServerResponse::new(err.into());
+            }
+        };
+
+        // dbg!(&req);
+
+        // ! Remove
+        let req_str = match str::from_utf8(&raw_request) {
+            Ok(s) => s,
+            Err(err) => {
+                return ServerResponse::new(H10LibError::from(err).into());
+            }
+        };
+
+        // ! REMOVE
+        let mut parser = RequestParser::new(Cow::from(req_str))
             .and_then(|p| p.method())
             .and_then(|p| p.url())
             .and_then(|p| p.version());
