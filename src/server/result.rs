@@ -1,5 +1,4 @@
 use std::{
-    any::Any,
     error::Error as StdError,
     fmt::Display,
     io::Error as StdIoError,
@@ -18,7 +17,6 @@ pub(crate) enum ServerError {
     AddrParseError(AddrParseError),
     PoisonErrorRwLockReadGuard,
     PortParseError,
-    CliParse,
     InvalidLogLevel,
     InvalidCLiArgs(String),
     Custom(String),
