@@ -5,12 +5,13 @@ use html_rs::{
 
 use h10::http::{
     headers::{ContentType, Pragma, Server},
+    result::H10LibResult,
     status_code::StatusCode,
 };
 
 use crate::server::ServerResponse;
 
-pub fn error_404() -> ServerResponse {
+pub fn error_404() -> H10LibResult<ServerResponse> {
     let favicon_disabled = Link::builder()
         .attr("rel", "shortcut icon")
         .attr("href", "data:image/x-icon;,")
@@ -30,9 +31,9 @@ pub fn error_404() -> ServerResponse {
     #[cfg(feature = "debug")]
     dbg!(&html);
 
-    ServerResponse::new(StatusCode::NotFound)
+    Ok(ServerResponse::new(StatusCode::NotFound)
         .header(ContentType::html())
         .header(Server::default())
         .header(Pragma::default())
-        .body(html)
+        .body(html))
 }

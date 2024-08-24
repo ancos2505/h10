@@ -16,7 +16,7 @@ use crate::{server::ServerResponse, ROOT_PAGER_COUNTER};
 
 pub fn root(request: Request) -> H10LibResult<ServerResponse> {
     if let Some(endpoint) = request.query_string.get("endpoint") {
-        match &**endpoint.name() {
+        match &**endpoint.value() {
             "counter" => {
                 let _ = ROOT_PAGER_COUNTER.fetch_add(1, Ordering::SeqCst);
                 return Ok(ServerResponse::new(StatusCode::MovedTemporarily)

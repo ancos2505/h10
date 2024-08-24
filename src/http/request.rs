@@ -24,7 +24,6 @@ use super::{method::Method, version::Version};
 
 #[derive(Debug, Default)]
 pub struct Request {
-    // request_str: Rc<str>,
     pub http_version: Version,
     pub method: Method,
     pub path: UrlPath,
@@ -92,12 +91,9 @@ impl Request {
 
         let headers = headers_str.parse()?;
 
-        dbg!(&headers, &query_string);
-
         let body = Some(body_region.parse()?);
 
         Ok(Request {
-            // request_str: rc_request_str,
             method,
             http_version,
             path,

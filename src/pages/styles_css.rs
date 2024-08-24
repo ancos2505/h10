@@ -1,8 +1,3 @@
-use html_rs::{
-    elements::{ElementBuilder, Meta, TextContent, Title, H1},
-    Html, HtmlBody,
-};
-
 use h10::http::{
     headers::{ContentType, Date, Pragma, Server},
     result::H10LibResult,

@@ -34,17 +34,15 @@ impl Endpoint {
             }
         }
 
-        let maybe_response = match &**request.path() {
-            "" => root(request).ok(),
-            "/" => root(request).ok(),
-            "/assets/styles.css" => styles_css().ok(),
-            _ => Some(error_404()),
+        let res = match &**request.path() {
+            "/" => root(request),
+            "/assets/styles.css" => styles_css(),
+            _ => error_404(),
         };
 
-        if let Some(response) = maybe_response {
-            return response;
-        } else {
-            error_404()
+        match res {
+            Ok(response) => return response,
+            Err(err) => ServerResponse::new(err.into()),
         }
     }
 }

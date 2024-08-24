@@ -6,18 +6,24 @@ use crate::http::result::{H10LibError, H10LibResult};
 pub struct QueryString(Vec<QsEntry>);
 impl QueryString {
     pub fn parse(s: Option<&str>) -> H10LibResult<Self> {
-        let input = match s {
-            Some(s) => s,
+        let query_string_str = match s {
+            Some(s) => {
+                if s.len() > 0 {
+                    s
+                } else {
+                    return Ok(QueryString::default());
+                }
+            }
             None => return Ok(QueryString::default()),
         };
 
-        let mut headers = vec![];
+        let mut query_string = vec![];
 
-        let mut iter = input.split("&");
+        let mut iter = query_string_str.split("&");
         while let Some(entry) = iter.next() {
-            headers.push(entry.parse()?);
+            query_string.push(entry.parse()?);
         }
-        Ok(Self(headers))
+        Ok(Self(query_string))
     }
     pub fn get(&self, name: &str) -> Option<&QsEntry> {
         for entry in &self.0 {
