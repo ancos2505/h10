@@ -1,10 +1,19 @@
 mod body;
-pub mod old_parser;
+mod headers;
+mod query_string;
+mod url_path;
 
 #[cfg(test)]
 mod tests;
 
 use std::rc::Rc;
+
+pub use self::{
+    body::Body,
+    headers::{HeaderEntry, HeaderName, HeaderValue, Headers},
+    query_string::{QsEntry, QsName, QsValue, QueryString},
+    url_path::UrlPath,
+};
 
 use crate::{
     constants::{AsciiWhiteSpace, MAX_REQUEST_LENGTH},
@@ -15,19 +24,20 @@ use super::{method::Method, version::Version};
 
 #[derive(Debug, Default)]
 pub struct Request {
-    request_str: Rc<str>,
+    // request_str: Rc<str>,
     pub http_version: Version,
     pub method: Method,
-    pub path: Option<Rc<str>>,
-    pub query: Vec<(Rc<str>, Rc<str>)>,
-    headers: Vec<(Rc<str>, Rc<str>)>,
-    body: Option<Rc<str>>,
+    pub path: UrlPath,
+    pub query_string: QueryString,
+    pub headers: Headers,
+    pub body: Option<Body>,
 }
 
 impl Request {
     pub fn parse(bytes: &[u8]) -> H10LibResult<Request> {
+        let now = std::time::Instant::now();
         if bytes.len() > MAX_REQUEST_LENGTH {
-            return Err(H10LibError::InvalidInputData(format!(
+            return Err(H10LibError::RequestParser(format!(
                 "Request size is larger than expected. MAX: {} Bytes",
                 MAX_REQUEST_LENGTH
             )));
@@ -39,11 +49,12 @@ impl Request {
 
         let method = Self::parse_method(first_line)?;
 
-        let http_version = Self::get_http_version(first_line)?;
+        let http_version = Self::parse_http_version(first_line)?;
 
-        dbg!(&method, &http_version);
-
-        // let method = Some(method_str.parse()?);
+        println!(
+            "Security check proof in {} secs",
+            now.elapsed().as_secs_f64()
+        );
 
         let request_str = std::str::from_utf8(bytes)?;
 
@@ -53,37 +64,49 @@ impl Request {
             .split_once("\r\n\r\n")
             .ok_or(H10LibError::RequestParser("Invalid HTTP Request".into()))?;
 
-        let (first_line, headers_str) = headers_region
-            .split_once("\r\n")
-            .ok_or(H10LibError::RequestParser("Malformed HTTP Request".into()))?;
+        let (first_line, headers_str) =
+            headers_region
+                .split_once("\r\n")
+                .ok_or(H10LibError::RequestParser(
+                    "Malformed HTTP Request Headers".into(),
+                ))?;
 
-        let (_, remaining) =
+        let (_, first_line_remaining) =
             first_line
                 .split_once(AsciiWhiteSpace::as_str())
                 .ok_or(H10LibError::RequestParser(
-                    "Malformed HTTP Method line".into(),
+                    "Malformed HTTP Header Method line".into(),
                 ))?;
 
-        let (path_str, version_str) =
-            remaining
-                .split_once(AsciiWhiteSpace::as_str())
-                .ok_or(H10LibError::RequestParser(
-                    "Malformed HTTP Method line".into(),
-                ))?;
+        let (url_str, _) = first_line_remaining
+            .split_once(AsciiWhiteSpace::as_str())
+            .ok_or(H10LibError::RequestParser(
+                "Malformed HTTP Header Method line on searching for Url path".into(),
+            ))?;
 
-        let path = Some(Rc::from(path_str));
+        let (maybe_path_str, maybe_qs_str) = Self::parse_url(url_str)?;
+
+        let path = UrlPath::parse(maybe_path_str)?;
+
+        let query_string = QueryString::parse(maybe_qs_str)?;
+
+        let headers = headers_str.parse()?;
+
+        dbg!(&headers, &query_string);
+
+        let body = Some(body_region.parse()?);
 
         Ok(Request {
-            request_str: rc_request_str,
+            // request_str: rc_request_str,
             method,
             http_version,
             path,
-            query: Vec::new(),
-            headers: Vec::new(),
-            body: None,
+            query_string,
+            headers,
+            body,
         })
     }
-    // TODO
+
     fn get_header_region<'a>(raw_request: &'a [u8]) -> H10LibResult<&'a [u8]> {
         let seq = b"\r\n\r\n";
         let mut i = 0;
@@ -95,6 +118,7 @@ impl Request {
         }
         Err(H10LibError::RequestParser("Invalid HTTP Request".into()))
     }
+
     fn get_header_line<'a>(input: &'a [u8]) -> H10LibResult<&'a [u8]> {
         let seq = b"\r\n";
         let mut i = 0;
@@ -106,6 +130,7 @@ impl Request {
         }
         Err(H10LibError::RequestParser("Invalid HTTP Request".into()))
     }
+
     fn parse_method(input: &[u8]) -> H10LibResult<Method> {
         let bytes = input
             .split(|b| *b == b' ')
@@ -125,7 +150,8 @@ impl Request {
         let method_str = std::str::from_utf8(bytes)?;
         method_str.parse()
     }
-    fn get_http_version(input: &[u8]) -> H10LibResult<Version> {
+
+    fn parse_http_version(input: &[u8]) -> H10LibResult<Version> {
         let mut iter = input.split(|b| *b == b' ');
         iter.next();
         iter.next();
@@ -144,5 +170,41 @@ impl Request {
 
         let version = std::str::from_utf8(bytes)?;
         version.parse()
+    }
+
+    fn parse_url<'a>(input: &'a str) -> H10LibResult<(Option<&'a str>, Option<&'a str>)> {
+        let trimmed = input.trim();
+        if trimmed.contains("?") {
+            let (path_str, query_string) = input.split_once("?").ok_or(
+                H10LibError::RequestParser("Malformed UrlPath in HTTP Header Method line".into()),
+            )?;
+            Ok((Some(path_str), Some(query_string)))
+        } else {
+            Ok((Some(trimmed), None))
+        }
+    }
+
+    pub fn http_version(&self) -> &Version {
+        &self.http_version
+    }
+
+    pub fn method(&self) -> &Method {
+        &self.method
+    }
+
+    pub fn path(&self) -> &UrlPath {
+        &self.path
+    }
+
+    pub fn query_string(&self) -> &QueryString {
+        &self.query_string
+    }
+
+    pub fn headers(&self) -> &Headers {
+        &self.headers
+    }
+
+    pub fn body(&self) -> Option<&Body> {
+        self.body.as_ref()
     }
 }

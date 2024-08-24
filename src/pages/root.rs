@@ -1,4 +1,4 @@
-use std::{cell::Ref, sync::atomic::Ordering};
+use std::sync::atomic::Ordering;
 
 use html_rs::{
     elements::{Div, ElementBuilder, Form, Input, Link, Meta, TextContent, Title, H1, P},
@@ -7,26 +7,22 @@ use html_rs::{
 
 use h10::http::{
     headers::{ContentType, Date, Location, Pragma, Server},
-    request::old_parser::RequestParsed,
+    request::Request,
     result::H10LibResult,
     status_code::StatusCode,
 };
 
 use crate::{server::ServerResponse, ROOT_PAGER_COUNTER};
 
-pub fn root(request: Ref<'_, RequestParsed<'_>>) -> H10LibResult<ServerResponse> {
-    if let Some(url) = &request.url {
-        if let Some(query_string) = &url.query {
-            if let Some(endpoint) = query_string.get("endpoint") {
-                match endpoint.trim() {
-                    "counter" => {
-                        let _ = ROOT_PAGER_COUNTER.fetch_add(1, Ordering::SeqCst);
-                        return Ok(ServerResponse::new(StatusCode::MovedTemporarily)
-                            .header(Location::from_str("/")?));
-                    }
-                    _ => (),
-                }
+pub fn root(request: Request) -> H10LibResult<ServerResponse> {
+    if let Some(endpoint) = request.query_string.get("endpoint") {
+        match &**endpoint.name() {
+            "counter" => {
+                let _ = ROOT_PAGER_COUNTER.fetch_add(1, Ordering::SeqCst);
+                return Ok(ServerResponse::new(StatusCode::MovedTemporarily)
+                    .header(Location::from_str("/")?));
             }
+            _ => (),
         }
     }
 

@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{rc::Rc, str::FromStr};
 
 use crate::http::result::H10LibError;
 
@@ -8,13 +8,12 @@ use crate::http::result::H10LibError;
 /// Reference: https://www.rfc-editor.org/rfc/rfc1867
 ///
 #[derive(Debug, PartialEq, Eq)]
-pub struct Body(String);
+pub struct Body(Rc<str>);
 
 impl FromStr for Body {
     type Err = H10LibError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let collected: String = s.chars().filter(|c| *c as u8 != 0).collect();
-        Ok(Self(collected.to_owned()))
+        Ok(Self(s.into()))
     }
 }
