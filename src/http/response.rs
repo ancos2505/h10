@@ -35,13 +35,11 @@ impl Display for Response {
             output.push_str("\r\n");
         }
 
-        output.push_str("\r\n");
-
         if let Some(body) = &self.body {
+            output.push_str("\r\n");
             output.push_str(body.as_str());
+            output.push_str("\n");
         }
-
-        output.push_str("\r\n\r\n");
 
         write!(f, "{}", output)
     }
@@ -69,7 +67,7 @@ impl Response {
         use crate::http::headers::ContentLength;
         let body = body.to_string();
 
-        let response = self.header(ContentLength::length(body.len() + 4));
+        let response = self.header(ContentLength::length(body.len() + 1));
 
         Self {
             http_version: response.http_version,

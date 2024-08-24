@@ -44,11 +44,11 @@ impl Request {
 
         let headers_region = Self::get_header_region(bytes)?;
 
-        let first_line = Self::get_header_line(headers_region)?;
+        let first_line_bytes = Self::get_method_line_bytes(headers_region)?;
 
-        let method = Self::parse_method(first_line)?;
+        let method = Self::parse_method(first_line_bytes)?;
 
-        let http_version = Self::parse_http_version(first_line)?;
+        let http_version = Self::parse_http_version(first_line_bytes)?;
 
         println!(
             "Security check proof in {} secs",
@@ -59,16 +59,20 @@ impl Request {
 
         let rc_request_str: Rc<str> = request_str.into();
 
-        let (headers_region, body_region) = rc_request_str
-            .split_once("\r\n\r\n")
-            .ok_or(H10LibError::RequestParser("Invalid HTTP Request".into()))?;
-
-        let (first_line, headers_str) =
-            headers_region
-                .split_once("\r\n")
+        let (headers_region, body_region) =
+            rc_request_str
+                .split_once("\r\n\r\n")
                 .ok_or(H10LibError::RequestParser(
-                    "Malformed HTTP Request Headers".into(),
+                    "Invalid HTTP Request on split headers and body".into(),
                 ))?;
+
+        let mut iter_headers = headers_region.split("\r\n");
+
+        let first_line = iter_headers.next().ok_or(H10LibError::RequestParser(
+            "Malformed HTTP Request Headers".into(),
+        ))?;
+
+        let maybe_headers_str = iter_headers.next();
 
         let (_, first_line_remaining) =
             first_line
@@ -89,7 +93,7 @@ impl Request {
 
         let query_string = QueryString::parse(maybe_qs_str)?;
 
-        let headers = headers_str.parse()?;
+        let headers = Headers::parse(maybe_headers_str)?;
 
         let body = Some(body_region.parse()?);
 
@@ -108,14 +112,16 @@ impl Request {
         let mut i = 0;
         while i + seq.len() <= raw_request.len() {
             if raw_request[i..i + seq.len()] == *seq {
-                return Ok(&raw_request[..i]);
+                return Ok(&raw_request[..(i + 2)]);
             }
             i += 1;
         }
-        Err(H10LibError::RequestParser("Invalid HTTP Request".into()))
+        Err(H10LibError::RequestParser(
+            "Invalid HTTP Request Header region".into(),
+        ))
     }
 
-    fn get_header_line<'a>(input: &'a [u8]) -> H10LibResult<&'a [u8]> {
+    fn get_method_line_bytes<'a>(input: &'a [u8]) -> H10LibResult<&'a [u8]> {
         let seq = b"\r\n";
         let mut i = 0;
         while i + seq.len() <= input.len() {
@@ -124,7 +130,9 @@ impl Request {
             }
             i += 1;
         }
-        Err(H10LibError::RequestParser("Invalid HTTP Request".into()))
+        Err(H10LibError::RequestParser(
+            "Invalid HTTP Request header line".into(),
+        ))
     }
 
     fn parse_method(input: &[u8]) -> H10LibResult<Method> {

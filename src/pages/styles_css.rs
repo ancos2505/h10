@@ -8,8 +8,6 @@ use crate::server::ServerResponse;
 
 pub fn styles_css() -> H10LibResult<ServerResponse> {
     let css = include_str!("../../assets/styles.css");
-    #[cfg(feature = "debug")]
-    dbg!(&html);
 
     Ok(ServerResponse::new(StatusCode::OK)
         .header(ContentType::css())

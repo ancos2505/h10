@@ -23,6 +23,7 @@ impl Default for Server {
 }
 
 impl Server {
+    #[allow(dead_code)]
     pub(crate) fn custom<S: ToString>(server_string: S) -> Self {
         Self {
             name: "Server".into(),

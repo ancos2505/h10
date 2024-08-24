@@ -1,17 +1,25 @@
 use std::{ops::Deref, rc::Rc, str::FromStr};
 
-use crate::http::result::H10LibError;
+use crate::http::result::{H10LibError, H10LibResult};
 
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct Headers(Vec<HeaderEntry>);
+impl Headers {
+    pub fn parse(s: Option<&str>) -> H10LibResult<Self> {
+        let headers_str = match s {
+            Some(s) => {
+                if s.len() > 0 {
+                    s
+                } else {
+                    return Ok(Headers::default());
+                }
+            }
+            None => return Ok(Headers::default()),
+        };
 
-impl FromStr for Headers {
-    type Err = H10LibError;
-
-    fn from_str(input: &str) -> Result<Self, Self::Err> {
         let mut headers = vec![];
 
-        let mut iter = input.split("\r\n");
+        let mut iter = headers_str.split("\r\n");
         while let Some(entry) = iter.next() {
             headers.push(entry.parse()?);
         }

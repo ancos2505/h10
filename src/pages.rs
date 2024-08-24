@@ -5,7 +5,7 @@ mod styles_css;
 use h10::http::{request::Request, result::H10LibError, version::Version};
 
 use crate::{
-    server::{CliHttp10StrictMode, ServerResponse},
+    server::{CliHttp10StrictMode, CliVerboseMode, ServerResponse},
     CLI_ARGS,
 };
 
@@ -20,7 +20,11 @@ impl Endpoint {
         let request = match Request::parse(raw_request) {
             Ok(req) => req,
             Err(err) => {
-                dbg!(&err);
+                if let Some(cli) = CLI_ARGS.get() {
+                    if cli.verbose == CliVerboseMode::Enabled {
+                        eprintln!("Error: {err}");
+                    }
+                }
                 return ServerResponse::new(err.into());
             }
         };

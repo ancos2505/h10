@@ -83,7 +83,7 @@ pub fn root(request: Request) -> H10LibResult<ServerResponse> {
         );
 
     #[cfg(feature = "debug")]
-    dbg!(&html);
+    println!("{html:?}");
 
     Ok(ServerResponse::new(StatusCode::OK)
         .header(ContentType::html())

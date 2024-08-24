@@ -29,7 +29,7 @@ pub fn error_404() -> H10LibResult<ServerResponse> {
         );
 
     #[cfg(feature = "debug")]
-    dbg!(&html);
+    println!("{html:?}");
 
     Ok(ServerResponse::new(StatusCode::NotFound)
         .header(ContentType::html())

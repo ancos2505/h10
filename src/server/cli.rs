@@ -7,8 +7,6 @@ mod verbose;
 
 use std::{collections::BTreeMap, env::Args};
 
-use h10::http::{headers::Server, result::H10LibError};
-
 use crate::server::cli::traits::ArgName;
 
 use super::{ServerError, ServerResult};
