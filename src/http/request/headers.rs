@@ -30,8 +30,8 @@ impl FromStr for HeaderEntry {
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         if let Some((key, value)) = input.split_once(":") {
             Ok(Self {
-                name: key.parse()?,
-                value: value.parse()?,
+                name: key.trim().parse()?,
+                value: value.trim().parse()?,
             })
         } else {
             Err(H10LibError::RequestParser(

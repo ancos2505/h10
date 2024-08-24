@@ -3,14 +3,13 @@ mod log;
 mod result;
 mod traits;
 
-use core::str;
 use std::{
     collections::BTreeMap,
     io::{Read, Write},
     net::{TcpListener, TcpStream},
     sync::{Arc, Mutex},
-    thread::{self, sleep},
-    time::{Duration, Instant},
+    thread::{self},
+    time::Instant,
 };
 
 pub(crate) use self::cli::{CliHttp10StrictMode, CliVerboseMode};
@@ -22,7 +21,6 @@ use h10::http::{
     status_code::StatusCode,
 };
 
-use self::cli::CliIpAddress;
 use self::log::LogLevel;
 
 pub(crate) use self::{
@@ -58,21 +56,12 @@ impl IntoResponse for ServerResponse {
 
 pub(crate) struct HttpServer;
 impl HttpServer {
-    // const CHUNK_SIZE: usize = FOUR_KBYTES;
-    // ! REMOVE
-    const CHUNK_SIZE: usize = 1024;
+    const CHUNK_SIZE: usize = FOUR_KBYTES;
 
     fn listener(cli_data: &Cli) -> String {
         format!("{}:{}", cli_data.ip_address, cli_data.port)
     }
     pub fn run() -> ServerResult<()> {
-        // let cli_data = ;
-        // let maybe_is_help = cli_data.map(|cli| cli.is_help);
-        // if let Some(is_help) = maybe_is_help {
-        //     if is_help {
-        //         Cli::usage()
-        //     }
-        // } else {
         if let Some(cli) = CLI_ARGS.get() {
             if cli.is_help {
                 Cli::usage();

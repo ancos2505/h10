@@ -13,7 +13,7 @@ impl QueryString {
 
         let mut headers = vec![];
 
-        let mut iter = input.split("\r\n");
+        let mut iter = input.split("&");
         while let Some(entry) = iter.next() {
             headers.push(entry.parse()?);
         }
@@ -26,19 +26,6 @@ impl QueryString {
             }
         }
         None
-    }
-}
-impl FromStr for QueryString {
-    type Err = H10LibError;
-
-    fn from_str(input: &str) -> Result<Self, Self::Err> {
-        let mut headers = vec![];
-
-        let mut iter = input.split("\r\n");
-        while let Some(entry) = iter.next() {
-            headers.push(entry.parse()?);
-        }
-        Ok(Self(headers))
     }
 }
 
@@ -62,10 +49,10 @@ impl FromStr for QsEntry {
     type Err = H10LibError;
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
-        if let Some((key, value)) = input.split_once(":") {
+        if let Some((key, value)) = input.split_once("=") {
             Ok(Self {
-                name: key.parse()?,
-                value: value.parse()?,
+                name: key.trim().parse()?,
+                value: value.trim().parse()?,
             })
         } else {
             Err(H10LibError::RequestParser(
