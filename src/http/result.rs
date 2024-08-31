@@ -27,6 +27,11 @@ pub enum H10LibError {
     Custom(String),
 }
 
+impl H10LibError {
+    pub fn custom(msg: &str) -> Self {
+        Self::Custom(msg.to_owned())
+    }
+}
 impl From<FromUtf8Error> for H10LibError {
     fn from(_: FromUtf8Error) -> Self {
         Self::FromUtf8Error

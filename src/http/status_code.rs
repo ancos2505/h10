@@ -1,5 +1,7 @@
 use std::fmt::{Debug, Display};
 
+use super::result::H10LibError;
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum StatusCode {
     OK,
@@ -17,6 +19,36 @@ pub enum StatusCode {
     NotImplemented,
     BadGateway,
     ServiceUnavailable,
+}
+
+impl TryFrom<u16> for StatusCode {
+    type Error = H10LibError;
+
+    fn try_from(code: u16) -> Result<Self, Self::Error> {
+        let status_code = match code {
+            200 => StatusCode::OK,
+            201 => StatusCode::Created,
+            202 => StatusCode::Accepted,
+            204 => StatusCode::NoContent,
+            301 => StatusCode::MovedPermanently,
+            302 => StatusCode::MovedTemporarily,
+            304 => StatusCode::NotModified,
+            400 => StatusCode::BadRequest,
+            401 => StatusCode::Unauthorized,
+            403 => StatusCode::Forbidden,
+            404 => StatusCode::NotFound,
+            500 => StatusCode::InternalServerError,
+            501 => StatusCode::NotImplemented,
+            502 => StatusCode::BadGateway,
+            503 => StatusCode::ServiceUnavailable,
+            _ => {
+                return Err(H10LibError::custom(
+                    format!("Invalid code number for {}", stringify!(Self)).as_str(),
+                ))
+            }
+        };
+        Ok(status_code)
+    }
 }
 
 impl Display for StatusCode {
