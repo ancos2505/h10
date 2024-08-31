@@ -1,4 +1,4 @@
-use crate::http::headers::{HttpHeader, IntoHeader};
+use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
 
 /// ### Content-Length header
 /// Related: Entity-Body
@@ -12,23 +12,28 @@ use crate::http::headers::{HttpHeader, IntoHeader};
 ///
 #[derive(Debug, PartialEq, Eq)]
 pub struct ContentLength {
-    name: String,
-    value: usize,
+    name: HeaderName,
+    value: HeaderValue,
+}
+impl Default for ContentLength {
+    fn default() -> Self {
+        Self {
+            name: HeaderName::new_unchecked("Content-Length"),
+            value: HeaderValue::new_unchecked("0"),
+        }
+    }
 }
 impl ContentLength {
     pub fn length(len: usize) -> Self {
         Self {
-            name: "Content-Length".into(),
-            value: len,
+            value: HeaderValue::new_unchecked(len.to_string()),
+            ..Default::default()
         }
     }
 }
 impl IntoHeader for ContentLength {
-    fn into_header(self) -> HttpHeader {
+    fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;
-        HttpHeader {
-            name,
-            value: value.to_string(),
-        }
+        HeaderEntry { name, value }
     }
 }

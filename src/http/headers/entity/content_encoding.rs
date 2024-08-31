@@ -1,3 +1,5 @@
+use crate::http::headers::{HeaderName, HeaderValue};
+
 /// ### Content-Encoding
 /// Related: Compression, Encryption, Base64
 ///
@@ -10,15 +12,15 @@
 /// Reference: https://www.rfc-editor.org/rfc/rfc1945.html#section-10.3
 #[derive(Debug, PartialEq, Eq)]
 pub struct ContentEncoding {
-    name: String,
-    value: String,
+    name: HeaderName,
+    value: HeaderValue,
 }
 
 impl ContentEncoding {
     pub fn gzip() -> Self {
         Self {
-            name: "Content-Encoding".into(),
-            value: "x-gzip".into(),
+            name: HeaderName::new_unchecked("Content-Encoding"),
+            value: HeaderValue::new_unchecked("x-gzip"),
         }
     }
 }

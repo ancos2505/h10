@@ -1,7 +1,7 @@
 use crate::http::{
-    headers::{HttpHeader, IntoHeader},
+    headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader},
     result::H10LibResult,
-    url_parts::UrlParts2,
+    url_path::UrlPath,
 };
 
 /// ### Location header
@@ -10,30 +10,31 @@ use crate::http::{
 /// Reference: https://www.rfc-editor.org/rfc/rfc1945.html#section-10.11
 #[derive(Debug, PartialEq, Eq)]
 pub struct Location {
-    name: String,
-    value: String,
+    name: HeaderName,
+    value: HeaderValue,
 }
+
+impl Default for Location {
+    fn default() -> Self {
+        Self {
+            name: HeaderName::new_unchecked("Location"),
+            value: HeaderValue::new_unchecked("#"),
+        }
+    }
+}
+
 impl Location {
     pub fn from_str<S: AsRef<str>>(url: S) -> H10LibResult<Self> {
         Ok(Self {
-            name: "Location".into(),
-            value: UrlParts2::parse(url.as_ref())?.to_string(),
+            value: HeaderValue::new_unchecked(UrlPath::parse(url.as_ref())?.to_string().as_str()),
+            ..Default::default()
         })
     }
 }
-// impl Default for Location {
-//     fn default() -> Self {
-//         Self {
-//             name: "Location".into(),
-//             value: "#".into(),
-//             ),
-//         }
-//     }
-// }
 
 impl IntoHeader for Location {
-    fn into_header(self) -> HttpHeader {
+    fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;
-        HttpHeader { name, value }
+        HeaderEntry { name, value }
     }
 }

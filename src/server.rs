@@ -37,13 +37,13 @@ impl ServerResponse {
         if HTTP10_STRICT_MODE.get().is_some() {
             Self(Response::new(status))
         } else {
-            Self(Response::new(status).header(Connection::default()))
+            Self(Response::new(status).add_header(Connection::default()))
         }
     }
     pub fn header<H: IntoHeader>(self, header: H) -> Self {
-        Self(self.0.header(header))
+        Self(self.0.add_header(header))
     }
-    pub fn body<B: ToString>(self, body: B) -> Self {
+    pub fn body<B: AsRef<str>>(self, body: B) -> Self {
         Self(self.0.body(body))
     }
 }

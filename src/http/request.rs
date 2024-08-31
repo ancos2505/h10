@@ -1,26 +1,23 @@
-mod body;
-mod headers;
-mod query_string;
-mod url_path;
+pub mod builder;
 
 #[cfg(test)]
 mod tests;
 
 use std::rc::Rc;
 
-pub use self::{
-    body::Body,
-    headers::{HeaderEntry, HeaderName, HeaderValue, Headers},
-    query_string::{QsEntry, QsName, QsValue, QueryString},
-    url_path::UrlPath,
-};
-
 use crate::{
     constants::{AsciiWhiteSpace, MAX_REQUEST_LENGTH},
     http::result::{H10LibError, H10LibResult},
 };
 
-use super::{method::Method, version::Version};
+use super::{
+    body::Body,
+    headers::Headers,
+    method::Method,
+    query_string::{QsEntry, QueryString},
+    url_path::UrlPath,
+    version::Version,
+};
 
 #[derive(Debug, Default)]
 pub struct Request {
@@ -89,7 +86,10 @@ impl Request {
 
         let (maybe_path_str, maybe_qs_str) = Self::parse_url(url_str)?;
 
-        let path = UrlPath::parse(maybe_path_str)?;
+        let path = match maybe_path_str {
+            Some(inner_str) => UrlPath::parse(inner_str)?,
+            None => UrlPath::default(),
+        };
 
         let query_string = QueryString::parse(maybe_qs_str)?;
 

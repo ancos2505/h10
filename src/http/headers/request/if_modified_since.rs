@@ -1,3 +1,5 @@
+use crate::http::headers::{HeaderName, HeaderValue};
+
 /// ### If-Modified-Since
 /// Related: Resource state
 /// 304 (not modified) response will be returned without any
@@ -7,6 +9,6 @@
 ///
 #[derive(Debug, PartialEq, Eq)]
 pub struct IfModifiedSince {
-    name: String,
-    value: String,
+    name: HeaderName,
+    value: HeaderValue,
 }

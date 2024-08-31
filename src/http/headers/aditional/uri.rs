@@ -1,4 +1,4 @@
-use crate::http::headers::{HttpHeader, IntoHeader};
+use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
 
 /// ### URI
 /// Related: Content handling
@@ -12,8 +12,8 @@ use crate::http::headers::{HttpHeader, IntoHeader};
 ///
 #[derive(Debug)]
 pub struct URI {
-    name: String,
-    value: String,
+    name: HeaderName,
+    value: HeaderValue,
 }
 
 // TODO
@@ -27,8 +27,8 @@ pub struct URI {
 // }
 
 impl IntoHeader for URI {
-    fn into_header(self) -> HttpHeader {
+    fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;
-        HttpHeader { name, value }
+        HeaderEntry { name, value }
     }
 }

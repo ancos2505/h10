@@ -1,4 +1,4 @@
-use crate::http::headers::{HttpHeader, IntoHeader};
+use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
 
 /// ### Pragma - header
 /// Related: Content state
@@ -6,21 +6,21 @@ use crate::http::headers::{HttpHeader, IntoHeader};
 /// Reference: https://www.rfc-editor.org/rfc/rfc1945.html#section-10.12
 #[derive(Debug, PartialEq, Eq)]
 pub struct Pragma {
-    name: String,
-    value: String,
+    name: HeaderName,
+    value: HeaderValue,
 }
 impl Default for Pragma {
     fn default() -> Self {
         Self {
-            name: "Pragma".into(),
-            value: "no-cache".into(),
+            name: HeaderName::new_unchecked("Pragma"),
+            value: HeaderValue::new_unchecked("no-cache"),
         }
     }
 }
 
 impl IntoHeader for Pragma {
-    fn into_header(self) -> HttpHeader {
+    fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;
-        HttpHeader { name, value }
+        HeaderEntry { name, value }
     }
 }

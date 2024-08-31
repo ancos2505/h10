@@ -1,4 +1,7 @@
-use crate::http::headers::{HttpHeader, IntoHeader};
+use crate::http::{
+    headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader},
+    result::H10LibResult,
+};
 
 /// ### Server header
 /// Related: Server/2.14 Library/3.57
@@ -6,35 +9,40 @@ use crate::http::headers::{HttpHeader, IntoHeader};
 /// Reference: https://www.rfc-editor.org/rfc/rfc1945.html#section-10.14
 #[derive(Debug, PartialEq, Eq)]
 pub struct Server {
-    name: String,
-    value: String,
+    name: HeaderName,
+    value: HeaderValue,
 }
+
 impl Default for Server {
     fn default() -> Self {
+        let value = format!(
+            "{} (v{})",
+            env!("CARGO_PKG_NAME"),
+            env!("CARGO_PKG_VERSION")
+        );
+
         Self {
-            name: "Server".into(),
-            value: format!(
-                "{} (v{})",
-                env!("CARGO_PKG_NAME"),
-                env!("CARGO_PKG_VERSION")
-            ),
+            name: HeaderName::new_unchecked("Server"),
+            value: HeaderValue::new_unchecked(&value),
         }
     }
 }
 
 impl Server {
     #[allow(dead_code)]
-    pub(crate) fn custom<S: ToString>(server_string: S) -> Self {
-        Self {
-            name: "Server".into(),
-            value: server_string.to_string(),
-        }
+    pub(crate) fn custom<S: AsRef<str>>(server_string: S) -> H10LibResult<Self> {
+        let value_str = server_string.as_ref();
+
+        Ok(Self {
+            value: value_str.parse()?,
+            ..Default::default()
+        })
     }
 }
 
 impl IntoHeader for Server {
-    fn into_header(self) -> HttpHeader {
+    fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;
-        HttpHeader { name, value }
+        HeaderEntry { name, value }
     }
 }

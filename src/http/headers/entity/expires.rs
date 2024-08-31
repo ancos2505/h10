@@ -1,3 +1,5 @@
+use crate::http::headers::{HeaderName, HeaderValue};
+
 /// ### Expires
 /// Related: Resource state
 ///
@@ -8,6 +10,6 @@
 ///
 #[derive(Debug, PartialEq, Eq)]
 pub struct Expires {
-    name: String,
-    value: String,
+    name: HeaderName,
+    value: HeaderValue,
 }

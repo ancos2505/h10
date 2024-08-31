@@ -1,3 +1,5 @@
+use crate::http::headers::{HeaderName, HeaderValue};
+
 /// ### Last-Modified
 /// Related: Content state
 ///
@@ -8,6 +10,6 @@
 ///
 #[derive(Debug, PartialEq, Eq)]
 pub struct LastModified {
-    name: String,
-    value: String,
+    name: HeaderName,
+    value: HeaderValue,
 }

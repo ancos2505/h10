@@ -1,4 +1,4 @@
-use crate::http::headers::{HttpHeader, IntoHeader};
+use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
 
 /// ### Accept-Language
 /// Related: Content handling
@@ -11,8 +11,8 @@ use crate::http::headers::{HttpHeader, IntoHeader};
 ///
 #[derive(Debug)]
 pub struct AcceptLanguage {
-    name: String,
-    value: String,
+    name: HeaderName,
+    value: HeaderValue,
 }
 
 // TODO
@@ -28,8 +28,8 @@ pub struct AcceptLanguage {
 // }
 
 impl IntoHeader for AcceptLanguage {
-    fn into_header(self) -> HttpHeader {
+    fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;
-        HttpHeader { name, value }
+        HeaderEntry { name, value }
     }
 }

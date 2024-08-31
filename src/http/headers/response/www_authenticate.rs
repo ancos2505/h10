@@ -1,4 +1,4 @@
-use crate::http::headers::{HttpHeader, IntoHeader};
+use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
 
 /// ### WWW-Authenticate header
 /// Related: Authentication/Authorization/Session
@@ -6,25 +6,22 @@ use crate::http::headers::{HttpHeader, IntoHeader};
 /// Reference: https://www.rfc-editor.org/rfc/rfc1945.html#section-10.16
 #[derive(Debug, PartialEq, Eq)]
 pub struct WWWAuthenticate {
-    name: String,
-    value: String,
+    name: HeaderName,
+    value: HeaderValue,
 }
-impl Default for WWWAuthenticate {
-    fn default() -> Self {
+
+impl WWWAuthenticate {
+    fn example() -> Self {
         Self {
-            name: "WWW-Authenticate".into(),
-            value: format!(
-                "{} (v{})",
-                env!("CARGO_PKG_NAME"),
-                env!("CARGO_PKG_VERSION")
-            ),
+            name: HeaderName::new_unchecked("WWW-Authenticate"),
+            value: HeaderValue::new_unchecked("1#challenge"),
         }
     }
 }
 
 impl IntoHeader for WWWAuthenticate {
-    fn into_header(self) -> HttpHeader {
+    fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;
-        HttpHeader { name, value }
+        HeaderEntry { name, value }
     }
 }

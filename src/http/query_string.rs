@@ -5,16 +5,38 @@ use crate::http::result::{H10LibError, H10LibResult};
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct QueryString(Vec<QsEntry>);
 impl QueryString {
+    pub fn empty() -> Self {
+        Self(vec![])
+    }
+
+    pub fn add(&mut self, qs_entry: QsEntry) {
+        let mut maybe_idx: Option<usize> = None;
+        for (idx, qs) in self.0.iter().enumerate() {
+            if qs.name() == qs_entry.name() {
+                maybe_idx = Some(idx);
+                break;
+            } else {
+                continue;
+            }
+        }
+
+        if let Some(found_idx) = maybe_idx {
+            self.0[found_idx] = qs_entry;
+        } else {
+            self.0.push(qs_entry);
+        }
+    }
+
     pub fn parse(s: Option<&str>) -> H10LibResult<Self> {
         let query_string_str = match s {
             Some(s) => {
                 if s.len() > 0 {
                     s
                 } else {
-                    return Ok(QueryString::default());
+                    return Ok(QueryString::empty());
                 }
             }
-            None => return Ok(QueryString::default()),
+            None => return Ok(QueryString::empty()),
         };
 
         let mut query_string = vec![];

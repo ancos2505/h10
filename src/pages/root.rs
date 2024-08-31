@@ -90,5 +90,5 @@ pub fn root(request: Request) -> H10LibResult<ServerResponse> {
         .header(Date::now()?)
         .header(Server::default())
         .header(Pragma::default())
-        .body(html))
+        .body(html.to_string()))
 }

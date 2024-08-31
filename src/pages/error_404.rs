@@ -35,5 +35,5 @@ pub fn error_404() -> H10LibResult<ServerResponse> {
         .header(ContentType::html())
         .header(Server::default())
         .header(Pragma::default())
-        .body(html))
+        .body(html.to_string()))
 }

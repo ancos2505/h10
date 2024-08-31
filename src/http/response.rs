@@ -1,15 +1,13 @@
 use std::{
-    collections::BTreeMap,
     fmt::{Debug, Display},
     str::FromStr,
 };
 
-use html_rs::Html;
-
 use crate::{constants::URL_MAX_LENGTH, http::result::H10LibError};
 
 use super::{
-    headers::{HttpHeader, IntoHeader},
+    body::Body,
+    headers::{Headers, IntoHeader},
     status_code::StatusCode,
     version::Version,
 };
@@ -18,8 +16,8 @@ use super::{
 pub struct Response {
     http_version: Version,
     pub status: StatusCode,
-    headers: BTreeMap<String, String>,
-    body: Option<String>,
+    headers: Headers,
+    body: Option<Body>,
 }
 
 impl Display for Response {
@@ -30,14 +28,14 @@ impl Display for Response {
         output.push_str(&self.status.to_string());
         output.push_str("\r\n");
 
-        for (name, value) in self.headers.iter() {
-            output.push_str(format!("{name}: {value}").as_str());
+        for header_entry in self.headers.iter() {
+            output.push_str(&header_entry.to_string());
             output.push_str("\r\n");
         }
 
         if let Some(body) = &self.body {
             output.push_str("\r\n");
-            output.push_str(body.as_str());
+            output.push_str(&body.to_string());
             output.push_str("\n");
         }
 
@@ -53,9 +51,9 @@ impl Response {
             body: Default::default(),
         }
     }
-    pub fn header<H: IntoHeader>(mut self, header: H) -> Self {
-        let HttpHeader { name, value } = header.into_header();
-        self.headers.insert(name, value);
+    pub fn add_header<H: IntoHeader>(mut self, header: H) -> Self {
+        let header_entry = header.into_header();
+        self.headers.add(header_entry);
         Self {
             http_version: self.http_version,
             status: self.status,
@@ -63,47 +61,16 @@ impl Response {
             body: self.body,
         }
     }
-    pub fn body<B: ToString>(self, body: B) -> Self {
+    pub fn body<B: AsRef<str>>(self, body: B) -> Self {
         use crate::http::headers::ContentLength;
-        let body = body.to_string();
-
-        let response = self.header(ContentLength::length(body.len() + 1));
+        let body = Body::new_unchecked(body.as_ref());
+        let response = self.add_header(ContentLength::length(body.len() + 1));
 
         Self {
             http_version: response.http_version,
             status: response.status,
             headers: response.headers,
-            body: Some(body),
+            body: Some(body.into()),
         }
-    }
-}
-
-#[derive(Debug, PartialEq, Eq)]
-pub struct UrlPath(String);
-impl FromStr for UrlPath {
-    type Err = H10LibError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s.chars().count() < URL_MAX_LENGTH {
-            for c in s.chars() {
-                if c.is_alphanumeric() || c.is_ascii_punctuation() {
-                    continue;
-                } else {
-                    return Err(H10LibError::InvalidInputData("Invalid char for URL".into()));
-                }
-            }
-            Ok(Self(s.to_owned()))
-        } else {
-            Err(H10LibError::InvalidInputData("Path is too large".into()))
-        }
-    }
-}
-
-#[derive(Debug, PartialEq, Eq)]
-pub struct Body(String);
-
-impl From<Html<'_>> for Body {
-    fn from(value: Html<'_>) -> Self {
-        Self(value.to_string())
     }
 }

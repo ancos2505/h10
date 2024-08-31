@@ -1,4 +1,4 @@
-use crate::http::headers::{HttpHeader, IntoHeader};
+use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
 
 /// ### Accept
 /// Related: Content handling
@@ -14,8 +14,8 @@ use crate::http::headers::{HttpHeader, IntoHeader};
 ///
 #[derive(Debug, PartialEq, Eq)]
 pub struct Accept {
-    name: String,
-    value: String,
+    name: HeaderName,
+    value: HeaderValue,
 }
 
 // TODO
@@ -31,8 +31,8 @@ pub struct Accept {
 // }
 
 impl IntoHeader for Accept {
-    fn into_header(self) -> HttpHeader {
+    fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;
-        HttpHeader { name, value }
+        HeaderEntry { name, value }
     }
 }

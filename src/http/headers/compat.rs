@@ -1,4 +1,4 @@
-use crate::http::headers::{HttpHeader, IntoHeader};
+use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
 
 /// ### Connection
 /// Related: HTTP/1.1 compatibility
@@ -13,22 +13,22 @@ use crate::http::headers::{HttpHeader, IntoHeader};
 ///
 #[derive(Debug, PartialEq, Eq)]
 pub struct Connection {
-    name: String,
-    value: String,
+    name: HeaderName,
+    value: HeaderValue,
 }
 
 impl Default for Connection {
     fn default() -> Self {
         Self {
-            name: "Connection".into(),
-            value: "close".into(),
+            name: HeaderName::new_unchecked("Connection"),
+            value: HeaderValue::new_unchecked("close"),
         }
     }
 }
 
 impl IntoHeader for Connection {
-    fn into_header(self) -> HttpHeader {
+    fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;
-        HttpHeader { name, value }
+        HeaderEntry { name, value }
     }
 }

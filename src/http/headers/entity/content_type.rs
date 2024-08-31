@@ -1,4 +1,4 @@
-use crate::http::headers::{HttpHeader, IntoHeader};
+use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
 
 /// ### Content-Type header
 /// Related: Entity-Body
@@ -14,54 +14,62 @@ use crate::http::headers::{HttpHeader, IntoHeader};
 ///
 #[derive(Debug, PartialEq, Eq)]
 pub struct ContentType {
-    name: String,
-    value: String,
+    name: HeaderName,
+    value: HeaderValue,
 }
 
+impl Default for ContentType {
+    fn default() -> Self {
+        Self {
+            name: HeaderName::new_unchecked("Content-Type"),
+            value: HeaderValue::new_unchecked("NotDefined"),
+        }
+    }
+}
 impl ContentType {
     pub fn octet_stream() -> Self {
         Self {
-            name: "Content-Type".into(),
-            value: "application/octet-stream".into(),
+            value: HeaderValue::new_unchecked("application/octet-stream"),
+            ..Default::default()
         }
     }
     pub fn html() -> Self {
         Self {
-            name: "Content-Type".into(),
-            value: "text/html; charset=UTF-8".into(),
+            value: HeaderValue::new_unchecked("text/html; charset=UTF-8"),
+            ..Default::default()
         }
     }
 
     pub fn css() -> Self {
         Self {
-            name: "Content-Type".into(),
-            value: "text/css; charset=UTF-8".into(),
+            value: HeaderValue::new_unchecked("text/css; charset=UTF-8"),
+            ..Default::default()
         }
     }
 
     pub fn javascript() -> Self {
         Self {
-            name: "Content-Type".into(),
-            value: "application/javascript; charset=UTF-8".into(),
+            value: HeaderValue::new_unchecked("application/javascript; charset=UTF-8"),
+            ..Default::default()
         }
     }
     pub fn json() -> Self {
         Self {
-            name: "Content-Type".into(),
-            value: "application/json; charset=UTF-8".into(),
+            value: HeaderValue::new_unchecked("application/json; charset=UTF-8"),
+            ..Default::default()
         }
     }
     pub fn form_url_encoded() -> Self {
         Self {
-            name: "Content-Type".into(),
-            value: "application/x-www-form-urlencoded".into(),
+            value: HeaderValue::new_unchecked("application/x-www-form-urlencoded"),
+            ..Default::default()
         }
     }
 }
 
 impl IntoHeader for ContentType {
-    fn into_header(self) -> HttpHeader {
+    fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;
-        HttpHeader { name, value }
+        HeaderEntry { name, value }
     }
 }

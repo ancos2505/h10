@@ -19,10 +19,8 @@ impl Deref for UrlPath {
 }
 
 impl UrlPath {
-    pub fn parse(s_opt: Option<&str>) -> H10LibResult<Self> {
-        match s_opt {
-            Some(s) => Ok(Self(s.into())),
-            None => Ok(UrlPath::default()),
-        }
+    pub fn parse<S: AsRef<str>>(s: S) -> H10LibResult<Self> {
+        let input = s.as_ref();
+        Ok(Self(input.into()))
     }
 }
