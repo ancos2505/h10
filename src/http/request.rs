@@ -5,6 +5,8 @@ mod tests;
 
 use std::rc::Rc;
 
+use builder::RequestBuilder;
+
 use crate::{
     constants::{AsciiWhiteSpace, MAX_REQUEST_LENGTH},
     http::result::{H10LibError, H10LibResult},
@@ -30,6 +32,10 @@ pub struct Request {
 }
 
 impl Request {
+    pub fn builder() -> RequestBuilder {
+        RequestBuilder
+    }
+
     pub fn parse(bytes: &[u8]) -> H10LibResult<Request> {
         let now = std::time::Instant::now();
         if bytes.len() > MAX_REQUEST_LENGTH {
