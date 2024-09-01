@@ -6,11 +6,13 @@ pub(crate) const TEN_MBYTES: usize = ONE_MBYTE * 10;
 
 pub(crate) const URL_PARTS_MAX_CHARS: usize = 1024;
 
-pub(crate) const MAX_REQUEST_LENGTH: usize = if cfg!(debug_assertions) {
+pub const MAX_REQUEST_LENGTH: usize = if cfg!(debug_assertions) {
     ONE_MBYTE
 } else {
     TEN_MBYTES
 };
+
+pub const MAX_RESPONSE_LENGTH: usize = MAX_REQUEST_LENGTH;
 
 pub(crate) struct AsciiWhiteSpace;
 impl AsciiWhiteSpace {

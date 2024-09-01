@@ -1,11 +1,11 @@
-use crate::http::url_path::UrlPath;
+use crate::http::{body::Body, url_path::UrlPath};
 
 use super::Request;
 
 #[test]
 fn build_simple_request_and_serialize_using_method_delete() {
     let expected_str = format!(
-        "DELETE / HTTP/1.0\r\nUser-Agent: {}/{}\r\n",
+        "DELETE / HTTP/1.0\r\nUser-Agent: {}/{}\r\n\r\n",
         env!("CARGO_PKG_NAME"),
         env!("CARGO_PKG_VERSION")
     );
@@ -18,7 +18,7 @@ fn build_simple_request_and_serialize_using_method_delete() {
 #[test]
 fn build_simple_request_and_serialize_using_method_get() {
     let expected_str = format!(
-        "GET / HTTP/1.0\r\nUser-Agent: {}/{}\r\n",
+        "GET / HTTP/1.0\r\nUser-Agent: {}/{}\r\n\r\n",
         env!("CARGO_PKG_NAME"),
         env!("CARGO_PKG_VERSION")
     );
@@ -30,7 +30,7 @@ fn build_simple_request_and_serialize_using_method_get() {
 #[test]
 fn build_simple_request_and_serialize_using_method_head() {
     let expected_str = format!(
-        "HEAD / HTTP/1.0\r\nUser-Agent: {}/{}\r\n",
+        "HEAD / HTTP/1.0\r\nUser-Agent: {}/{}\r\n\r\n",
         env!("CARGO_PKG_NAME"),
         env!("CARGO_PKG_VERSION")
     );
@@ -41,7 +41,7 @@ fn build_simple_request_and_serialize_using_method_head() {
 #[test]
 fn build_simple_request_and_serialize_using_method_link() {
     let expected_str = format!(
-        "LINK / HTTP/1.0\r\nUser-Agent: {}/{}\r\n",
+        "LINK / HTTP/1.0\r\nUser-Agent: {}/{}\r\n\r\n",
         env!("CARGO_PKG_NAME"),
         env!("CARGO_PKG_VERSION")
     );
@@ -53,11 +53,14 @@ fn build_simple_request_and_serialize_using_method_link() {
 #[test]
 fn build_simple_request_and_serialize_using_method_post() {
     let expected_str = format!(
-        "POST / HTTP/1.0\r\nUser-Agent: {}/{}\r\n",
+        "POST / HTTP/1.0\r\nUser-Agent: {}/{}\r\nContent-Length: 0\r\n\r\n",
         env!("CARGO_PKG_NAME"),
         env!("CARGO_PKG_VERSION")
     );
-    let request = Request::post().path(UrlPath::root()).finish();
+    let request = Request::post()
+        .path(UrlPath::root())
+        .set_body(Body::empty())
+        .finish();
 
     assert_eq!(expected_str, &*request.to_string())
 }
@@ -65,11 +68,14 @@ fn build_simple_request_and_serialize_using_method_post() {
 #[test]
 fn build_simple_request_and_serialize_using_method_put() {
     let expected_str = format!(
-        "PUT / HTTP/1.0\r\nUser-Agent: {}/{}\r\n",
+        "PUT / HTTP/1.0\r\nUser-Agent: {}/{}\r\nContent-Length: 0\r\n\r\n",
         env!("CARGO_PKG_NAME"),
         env!("CARGO_PKG_VERSION")
     );
-    let request = Request::put().path(UrlPath::root()).finish();
+    let request = Request::put()
+        .path(UrlPath::root())
+        .set_body(Body::empty())
+        .finish();
 
     assert_eq!(expected_str, &*request.to_string())
 }
@@ -77,7 +83,7 @@ fn build_simple_request_and_serialize_using_method_put() {
 #[test]
 fn build_simple_request_and_serialize_using_method_unlink() {
     let expected_str = format!(
-        "UNLINK / HTTP/1.0\r\nUser-Agent: {}/{}\r\n",
+        "UNLINK / HTTP/1.0\r\nUser-Agent: {}/{}\r\n\r\n",
         env!("CARGO_PKG_NAME"),
         env!("CARGO_PKG_VERSION")
     );

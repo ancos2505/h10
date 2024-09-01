@@ -27,11 +27,15 @@ impl FromStr for CliPortNumber {
     type Err = ServerError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let ip_addr = s.parse().map_err(|_| ServerError::PortParseError)?;
+        let ip_addr = s
+            .parse()
+            .map_err(|_| ServerError::PortParseError("Invalid payload for Port number".into()))?;
         if ip_addr > 1024 {
             Ok(Self(ip_addr))
         } else {
-            Err(ServerError::PortParseError)
+            Err(ServerError::PortParseError(
+                "Port must be higher than 1023".into(),
+            ))
         }
     }
 }

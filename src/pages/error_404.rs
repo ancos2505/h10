@@ -32,8 +32,8 @@ pub fn error_404() -> H10LibResult<ServerResponse> {
     println!("{html:?}");
 
     Ok(ServerResponse::new(StatusCode::NotFound)
-        .header(ContentType::html())
-        .header(Server::default())
-        .header(Pragma::default())
-        .body(html.to_string()))
+        .add_header(ContentType::html())
+        .add_header(Server::default())
+        .add_header(Pragma::default())
+        .set_body(html.to_string()))
 }

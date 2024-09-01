@@ -1,5 +1,13 @@
 use std::thread;
 
+use h10::http::{
+    request::Request,
+    response::Response,
+    result::{H10LibError, H10LibResult},
+    status_code::StatusCode,
+    url_path::UrlPath,
+};
+
 fn main() {
     let num_of_requests = 10;
     let num_of_rounds = 100;
@@ -15,11 +23,11 @@ fn next_wave(num_of_requests: usize) {
     for i in 0..num_of_requests {
         thread::spawn(move || {
             println!("Req #{}", i + 1);
-            request();
+            request().unwrap();
         });
     }
 }
-fn request() {
+fn request() -> H10LibResult<()> {
     use std::io::Read;
     use std::io::Write;
     use std::net::TcpStream;
@@ -28,23 +36,22 @@ fn request() {
     let mut buf: [u8; 1024] = [0; 1024];
     let start = Instant::now();
     let mut stream = TcpStream::connect(&connect_str).unwrap();
-    stream.write_all(b"GET / HTTP/1.0\r\n\r\n").unwrap();
+    let request = Request::get().path(UrlPath::root()).finish();
+    stream.write_all(request.to_string().as_bytes()).unwrap();
     let num_bytes = stream.read(&mut buf).unwrap();
     // let duration = start.elapsed();
 
-    let status_code = get_status_code(&buf[..num_bytes]);
+    let status_code = get_status_code(&buf[..num_bytes])?;
 
-    println!("Status: {}", status_code);
+    println!(
+        "Status: {} in {} secs",
+        status_code,
+        start.elapsed().as_secs_f32()
+    );
+    Ok(())
 }
 
-fn get_status_code(response: &[u8]) -> u16 {
-    let mut lines = response.split(|&b| b == b'\n');
-    if let Some(status_line) = lines.next() {
-        let response_str = String::from_utf8_lossy(status_line);
-        let status_line = response_str.split("\r\n").next().unwrap();
-        if let Some(code) = status_line.split(" ").nth(1) {
-            return code.parse().unwrap_or(0);
-        }
-    }
-    0
+fn get_status_code(response_bytes: &[u8]) -> H10LibResult<StatusCode> {
+    let (_, status_code, ..) = Response::parse(response_bytes)?.into_inner();
+    Ok(status_code)
 }

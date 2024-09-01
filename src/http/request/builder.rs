@@ -1,6 +1,11 @@
 use std::marker::PhantomData;
 
-use crate::http::{headers::IntoHeader, method::Method, url_path::UrlPath, version::Version};
+use crate::http::{
+    headers::{ContentLength, IntoHeader},
+    method::Method,
+    url_path::UrlPath,
+    version::Version,
+};
 
 use super::{Body, Headers, QsEntry, QueryString, Request};
 
@@ -272,9 +277,12 @@ impl Step3<WithBody> {
             method,
             path,
             query_string,
-            headers,
+            mut headers,
             ..
         } = self;
+
+        headers.add(ContentLength::length((*body).len()).into_header());
+
         Step4 {
             http_version,
             method,
@@ -282,25 +290,6 @@ impl Step3<WithBody> {
             query_string,
             headers,
             body: Some(body),
-        }
-    }
-    pub fn finish(self) -> Request {
-        let Self {
-            http_version,
-            method,
-            path,
-            query_string,
-            headers,
-            ..
-        } = self;
-
-        Request {
-            http_version,
-            method,
-            path,
-            query_string,
-            headers,
-            body: None,
         }
     }
 }

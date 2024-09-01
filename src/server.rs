@@ -40,11 +40,11 @@ impl ServerResponse {
             Self(Response::new(status).add_header(Connection::default()))
         }
     }
-    pub fn header<H: IntoHeader>(self, header: H) -> Self {
+    pub fn add_header<H: IntoHeader>(self, header: H) -> Self {
         Self(self.0.add_header(header))
     }
-    pub fn body<B: AsRef<str>>(self, body: B) -> Self {
-        Self(self.0.body(body))
+    pub fn set_body<B: AsRef<str>>(self, body: B) -> Self {
+        Self(self.0.set_body(body))
     }
 }
 
@@ -215,7 +215,7 @@ impl HttpServer {
                 // dbg!(error);
             }
         };
-        let statuscode_str = server_response.0.status.to_string();
+        let statuscode_str = server_response.0.status().to_string();
         let response_str = server_response.into_response().to_string();
         match stream.write(response_str.as_bytes()) {
             Ok(bytes) => {

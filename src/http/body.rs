@@ -1,4 +1,4 @@
-use std::{fmt::Display, rc::Rc, str::FromStr};
+use std::{fmt::Display, ops::Deref, rc::Rc, str::FromStr};
 
 use crate::http::result::H10LibError;
 
@@ -15,8 +15,20 @@ impl Body {
         Self(s.into())
     }
 
+    pub fn empty() -> Self {
+        Self("".into())
+    }
+
     pub fn len(&self) -> usize {
         self.0.len()
+    }
+}
+
+impl Deref for Body {
+    type Target = str;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
 

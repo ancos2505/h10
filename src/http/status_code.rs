@@ -1,4 +1,7 @@
-use std::fmt::{Debug, Display};
+use std::{
+    fmt::{Debug, Display},
+    str::FromStr,
+};
 
 use super::result::H10LibError;
 
@@ -19,6 +22,18 @@ pub enum StatusCode {
     NotImplemented,
     BadGateway,
     ServiceUnavailable,
+}
+impl StatusCode {
+    pub const MAX_LENGTH: usize = 3;
+}
+
+impl FromStr for StatusCode {
+    type Err = H10LibError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let code: u16 = s.parse()?;
+        code.try_into()
+    }
 }
 
 impl TryFrom<u16> for StatusCode {

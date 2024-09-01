@@ -26,17 +26,23 @@ fn main() -> ExitCode {
         Ok(_) => ExitCode::SUCCESS,
         Err(err) => match err {
             ServerError::InvalidCLiArgs(arg) => {
-                eprintln!("Error: unexpected argument '{arg}'\n");
+                eprintln!("Cli Parsing: unexpected argument '{arg}'");
                 Cli::usage();
                 ExitCode::FAILURE
             }
-            // ServerError::H10LibError(_)
-            ServerError::StdIoError
-            | ServerError::AddrParseError
-            | ServerError::PoisonErrorRwLockReadGuard
-            | ServerError::PortParseError
-            | ServerError::InvalidLogLevel
-            | ServerError::Custom(_) => ExitCode::from(2),
+            // ServerError::H10LibError(err) => {
+            //     eprintln!("H10LibError:'{}'\n", err.to_string());
+            //     ExitCode::from(2)
+            // }
+            ServerError::StdIoError(err)
+            | ServerError::AddrParseError(err)
+            | ServerError::PoisonErrorRwLockReadGuard(err)
+            | ServerError::PortParseError(err)
+            | ServerError::InvalidLogLevel(err)
+            | ServerError::Custom(err) => {
+                eprintln!("Server Error: '{err}'");
+                ExitCode::from(3)
+            }
         },
     }
 }

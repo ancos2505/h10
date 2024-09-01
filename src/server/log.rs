@@ -20,7 +20,7 @@ impl FromStr for LogLevel {
             "INFO" => Self::INFO,
             "DEBUG" => Self::DEBUG,
             "TRACE, " => Self::TRACE,
-            _ => return Err(ServerError::InvalidLogLevel),
+            _ => return Err(ServerError::InvalidLogLevel("Invalid log level".into())),
         };
         Ok(level)
     }

@@ -20,7 +20,7 @@ pub fn root(request: Request) -> H10LibResult<ServerResponse> {
             "counter" => {
                 let _ = ROOT_PAGER_COUNTER.fetch_add(1, Ordering::SeqCst);
                 return Ok(ServerResponse::new(StatusCode::MovedTemporarily)
-                    .header(Location::from_str("/")?));
+                    .add_header(Location::from_str("/")?));
             }
             _ => (),
         }
@@ -86,9 +86,9 @@ pub fn root(request: Request) -> H10LibResult<ServerResponse> {
     println!("{html:?}");
 
     Ok(ServerResponse::new(StatusCode::OK)
-        .header(ContentType::html())
-        .header(Date::now()?)
-        .header(Server::default())
-        .header(Pragma::default())
-        .body(html.to_string()))
+        .add_header(ContentType::html())
+        .add_header(Date::now()?)
+        .add_header(Server::default())
+        .add_header(Pragma::default())
+        .set_body(html.to_string()))
 }

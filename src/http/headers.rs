@@ -60,21 +60,32 @@ impl Headers {
             self.0.push(header_entry);
         }
     }
-    pub fn parse(s: Option<&str>) -> H10LibResult<Self> {
-        let headers_str = match s {
-            Some(s) => {
-                if s.len() > 0 {
-                    s
-                } else {
-                    return Ok(Headers::empty());
-                }
+    pub fn get(&self, header_name: &HeaderName) -> Option<&HeaderEntry> {
+        let mut maybe_idx: Option<usize> = None;
+        for (idx, header) in self.0.iter().enumerate() {
+            if header.name() == header_name {
+                maybe_idx = Some(idx);
+                break;
+            } else {
+                continue;
             }
-            None => return Ok(Headers::empty()),
+        }
+        maybe_idx.and_then(|idx| self.0.get(idx))
+    }
+
+    pub fn parse(s: &str) -> H10LibResult<Self> {
+        let headers_str = if s.len() > 0 {
+            s
+        } else {
+            return Ok(Headers::empty());
         };
 
         let mut headers = vec![];
 
         let mut iter = headers_str.split("\r\n");
+
+        let _discard_status_line = iter.next();
+
         while let Some(entry) = iter.next() {
             headers.push(entry.parse()?);
         }
@@ -124,7 +135,7 @@ impl FromStr for HeaderEntry {
                 value: value.trim().parse()?,
             })
         } else {
-            Err(H10LibError::RequestParser(
+            Err(H10LibError::HeadersParser(
                 "Malformed HTTP Header entry".into(),
             ))
         }

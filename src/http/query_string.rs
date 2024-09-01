@@ -83,7 +83,7 @@ impl FromStr for QsEntry {
                 value: value.trim().parse()?,
             })
         } else {
-            Err(H10LibError::RequestParser(
+            Err(H10LibError::QueryStringParser(
                 "Malformed Query String entry".into(),
             ))
         }
