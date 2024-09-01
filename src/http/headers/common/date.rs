@@ -17,7 +17,7 @@ impl Default for Date {
     fn default() -> Self {
         Self {
             name: HeaderName::new_unchecked("Date"),
-            value: HeaderValue::new_unchecked("0"),
+            value: HeaderValue::new_unchecked("NotDefined"),
         }
     }
 }

@@ -13,18 +13,6 @@ pub struct Title {
     value: HeaderValue,
 }
 
-// TODO
-// impl Default for Title {
-//     fn default() -> Self {
-//         let r#type = "*";
-//         let subtype = "*";
-//         Self {
-//             name: "Title".into(),
-//             value: "Example Title".into(),
-//         }
-//     }
-// }
-
 impl IntoHeader for Title {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

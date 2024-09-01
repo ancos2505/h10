@@ -15,18 +15,6 @@ pub struct ContentLanguage {
     value: HeaderValue,
 }
 
-// TODO
-// impl Default for ContentLanguage {
-//     fn default() -> Self {
-//         let r#type = "*";
-//         let subtype = "*";
-//         Self {
-//             name: "Content-Language".into(),
-//             value: format!("{}/{}", r#type, subtype,),
-//         }
-//     }
-// }
-
 impl IntoHeader for ContentLanguage {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

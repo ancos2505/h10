@@ -18,7 +18,7 @@ impl Default for Location {
     fn default() -> Self {
         Self {
             name: HeaderName::new_unchecked("Location"),
-            value: HeaderValue::new_unchecked("#"),
+            value: HeaderValue::new_unchecked("NotDefined"),
         }
     }
 }

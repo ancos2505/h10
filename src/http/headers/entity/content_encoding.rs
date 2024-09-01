@@ -15,12 +15,20 @@ pub struct ContentEncoding {
     name: HeaderName,
     value: HeaderValue,
 }
+impl Default for ContentEncoding {
+    fn default() -> Self {
+        Self {
+            name: HeaderName::new_unchecked("Content-Encoding"),
+            value: HeaderValue::new_unchecked("NotDefined"),
+        }
+    }
+}
 
 impl ContentEncoding {
     pub fn gzip() -> Self {
         Self {
-            name: HeaderName::new_unchecked("Content-Encoding"),
             value: HeaderValue::new_unchecked("x-gzip"),
+            ..Default::default()
         }
     }
 }

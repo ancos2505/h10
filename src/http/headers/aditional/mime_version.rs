@@ -18,18 +18,6 @@ pub struct MIMEVersion {
     value: HeaderValue,
 }
 
-// TODO
-// impl Default for MIMEVersion {
-//     fn default() -> Self {
-//         let r#type = "*";
-//         let subtype = "*";
-//         Self {
-//             name: "MIME-Version".into(),
-//             value: format!("{}/{}", r#type, subtype,),
-//         }
-//     }
-// }
-
 impl IntoHeader for MIMEVersion {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

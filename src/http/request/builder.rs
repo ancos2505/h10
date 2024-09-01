@@ -1,6 +1,6 @@
 use crate::http::{headers::IntoHeader, method::Method, url_path::UrlPath, version::Version};
 
-use super::{Body, Headers, QsEntry, QueryString};
+use super::{Body, Headers, QsEntry, QueryString, Request};
 
 #[derive(Debug)]
 pub struct RequestBuilder;
@@ -96,13 +96,70 @@ impl Step3 {
             headers,
         }
     }
+    pub fn set_body(self, body: Body) -> Step4 {
+        let Self {
+            http_version,
+            method,
+            path,
+            query_string,
+            headers,
+        } = self;
+        Step4 {
+            http_version,
+            method,
+            path,
+            query_string,
+            headers,
+            body: Some(body),
+        }
+    }
+    pub fn finish(self) -> Request {
+        let Self {
+            http_version,
+            method,
+            path,
+            query_string,
+            headers,
+        } = self;
+
+        Request {
+            http_version,
+            method,
+            path,
+            query_string,
+            headers,
+            body: None,
+        }
+    }
 }
 
-struct Request {
+#[derive(Debug)]
+pub struct Step4 {
     http_version: Version,
     method: Method,
     path: UrlPath,
     query_string: QueryString,
     headers: Headers,
     body: Option<Body>,
+}
+impl Step4 {
+    pub fn finish(self) -> Request {
+        let Self {
+            http_version,
+            method,
+            path,
+            query_string,
+            headers,
+            body,
+        } = self;
+
+        Request {
+            http_version,
+            method,
+            path,
+            query_string,
+            headers,
+            body,
+        }
+    }
 }

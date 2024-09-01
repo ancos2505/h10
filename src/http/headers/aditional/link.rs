@@ -16,18 +16,6 @@ pub struct Link {
     value: HeaderValue,
 }
 
-// TODO
-// impl Default for Link {
-//     fn default() -> Self {
-//         let r#type = "*";
-//         let subtype = "*";
-//         Self {
-//             name: "Link".into(),
-//             value: format!("{}/{}", r#type, subtype,),
-//         }
-//     }
-// }
-
 impl IntoHeader for Link {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

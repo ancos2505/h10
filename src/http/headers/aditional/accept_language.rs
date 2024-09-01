@@ -15,18 +15,6 @@ pub struct AcceptLanguage {
     value: HeaderValue,
 }
 
-// TODO
-// impl Default for AcceptLanguage {
-//     fn default() -> Self {
-//         let r#type = "*";
-//         let subtype = "*";
-//         Self {
-//             name: "Accept-Language".into(),
-//             value: format!("{}/{}", r#type, subtype,),
-//         }
-//     }
-// }
-
 impl IntoHeader for AcceptLanguage {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

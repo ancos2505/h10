@@ -17,18 +17,6 @@ pub struct AcceptCharset {
     value: HeaderValue,
 }
 
-// TODO
-// impl Default for AcceptCharset {
-//     fn default() -> Self {
-//         let r#type = "*";
-//         let subtype = "*";
-//         Self {
-//             name: "Accept-Charset".into(),
-//             value: format!("UTF-8", r#type, subtype,),
-//         }
-//     }
-// }
-
 impl IntoHeader for AcceptCharset {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

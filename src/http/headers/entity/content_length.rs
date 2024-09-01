@@ -19,7 +19,7 @@ impl Default for ContentLength {
     fn default() -> Self {
         Self {
             name: HeaderName::new_unchecked("Content-Length"),
-            value: HeaderValue::new_unchecked("0"),
+            value: HeaderValue::new_unchecked("NotDefined"),
         }
     }
 }

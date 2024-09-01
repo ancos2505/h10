@@ -14,18 +14,6 @@ pub struct AcceptEncoding {
     value: HeaderValue,
 }
 
-// TODO
-// impl Default for AcceptEncoding {
-//     fn default() -> Self {
-//         let r#type = "*";
-//         let subtype = "*";
-//         Self {
-//             name: "Accept-Encoding".into(),
-//             value: format!("{}/{}", r#type, subtype,),
-//         }
-//     }
-// }
-
 impl IntoHeader for AcceptEncoding {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

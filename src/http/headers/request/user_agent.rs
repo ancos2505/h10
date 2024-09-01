@@ -16,7 +16,7 @@ pub struct UserAgent {
 impl IntoHeader for UserAgent {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;
-        HeaderEntry::builder().name(name).value(value).finish()
+        HeaderEntry { name, value }
     }
 }
 

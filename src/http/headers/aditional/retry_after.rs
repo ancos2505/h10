@@ -17,18 +17,6 @@ pub struct RetryAfter {
     value: HeaderValue,
 }
 
-// TODO
-// impl Default for RetryAfter {
-//     fn default() -> Self {
-//         let r#type = "*";
-//         let subtype = "*";
-//         Self {
-//             name: "Retry-After".into(),
-//             value: format!("{}/{}", r#type, subtype,),
-//         }
-//     }
-// }
-
 impl IntoHeader for RetryAfter {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

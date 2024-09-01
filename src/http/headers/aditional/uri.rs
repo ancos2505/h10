@@ -16,16 +16,6 @@ pub struct URI {
     value: HeaderValue,
 }
 
-// TODO
-// impl Default for URI {
-//     fn default() -> Self {
-//         Self {
-//             name: "URI".into(),
-//             value: "".into(),
-//         }
-//     }
-// }
-
 impl IntoHeader for URI {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

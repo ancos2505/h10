@@ -18,18 +18,6 @@ pub struct Accept {
     value: HeaderValue,
 }
 
-// TODO
-// impl Default for Accept {
-//     fn default() -> Self {
-//         let r#type = "*";
-//         let subtype = "*";
-//         Self {
-//             name: "Accept".into(),
-//             value: format!("{}/{}", r#type, subtype,),
-//         }
-//     }
-// }
-
 impl IntoHeader for Accept {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

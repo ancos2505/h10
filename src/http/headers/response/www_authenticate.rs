@@ -14,7 +14,7 @@ impl WWWAuthenticate {
     fn example() -> Self {
         Self {
             name: HeaderName::new_unchecked("WWW-Authenticate"),
-            value: HeaderValue::new_unchecked("1#challenge"),
+            value: HeaderValue::new_unchecked("NotDefined"),
         }
     }
 }
