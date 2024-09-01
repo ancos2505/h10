@@ -6,8 +6,6 @@ pub(crate) const TEN_MBYTES: usize = ONE_MBYTE * 10;
 
 pub(crate) const URL_PARTS_MAX_CHARS: usize = 1024;
 
-pub(crate) const URL_MAX_LENGTH: usize = 4096;
-
 pub(crate) const MAX_REQUEST_LENGTH: usize = if cfg!(debug_assertions) {
     ONE_MBYTE
 } else {

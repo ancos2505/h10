@@ -1,9 +1,4 @@
-use std::{
-    fmt::{Debug, Display},
-    str::FromStr,
-};
-
-use crate::{constants::URL_MAX_LENGTH, http::result::H10LibError};
+use std::fmt::{Debug, Display};
 
 use super::{
     body::Body,
@@ -42,6 +37,7 @@ impl Display for Response {
         write!(f, "{}", output)
     }
 }
+
 impl Response {
     pub fn new(status: StatusCode) -> Self {
         Self {

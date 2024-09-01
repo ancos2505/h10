@@ -6,15 +6,17 @@ use std::{
     sync::{PoisonError, RwLockReadGuard},
 };
 
-use h10::http::result::H10LibError;
+// use h10::http::result::H10LibError;
 
 pub(crate) type ServerResult<T> = Result<T, ServerError>;
 
 #[derive(Debug)]
 pub(crate) enum ServerError {
-    H10LibError(H10LibError),
-    StdIoError(StdIoError),
-    AddrParseError(AddrParseError),
+    // H10LibError(H10LibError),
+    // StdIoError(StdIoError),
+    StdIoError,
+    // AddrParseError(AddrParseError),
+    AddrParseError,
     PoisonErrorRwLockReadGuard,
     PortParseError,
     InvalidLogLevel,
@@ -32,21 +34,25 @@ impl<T> From<PoisonError<RwLockReadGuard<'_, T>>> for ServerError {
         Self::PoisonErrorRwLockReadGuard
     }
 }
+
 impl From<AddrParseError> for ServerError {
-    fn from(value: AddrParseError) -> Self {
-        Self::AddrParseError(value)
+    fn from(_: AddrParseError) -> Self {
+        Self::AddrParseError
     }
 }
+
 impl From<StdIoError> for ServerError {
-    fn from(value: StdIoError) -> Self {
-        Self::StdIoError(value)
+    fn from(_: StdIoError) -> Self {
+        Self::StdIoError
     }
 }
-impl From<H10LibError> for ServerError {
-    fn from(value: H10LibError) -> Self {
-        Self::H10LibError(value)
-    }
-}
+
+// impl From<H10LibError> for ServerError {
+//     fn from(value: H10LibError) -> Self {
+//         Self::H10LibError(value)
+//     }
+// }
+
 impl Display for ServerError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:?}", self)

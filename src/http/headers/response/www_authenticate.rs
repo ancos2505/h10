@@ -10,14 +10,14 @@ pub struct WWWAuthenticate {
     value: HeaderValue,
 }
 
-impl WWWAuthenticate {
-    fn example() -> Self {
-        Self {
-            name: HeaderName::new_unchecked("WWW-Authenticate"),
-            value: HeaderValue::new_unchecked("NotDefined"),
-        }
-    }
-}
+// impl WWWAuthenticate {
+//     fn example() -> Self {
+//         Self {
+//             name: HeaderName::new_unchecked("WWW-Authenticate"),
+//             value: HeaderValue::new_unchecked("NotDefined"),
+//         }
+//     }
+// }
 
 impl IntoHeader for WWWAuthenticate {
     fn into_header(self) -> HeaderEntry {

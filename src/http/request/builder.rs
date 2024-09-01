@@ -1,70 +1,172 @@
+use std::marker::PhantomData;
+
 use crate::http::{headers::IntoHeader, method::Method, url_path::UrlPath, version::Version};
 
 use super::{Body, Headers, QsEntry, QueryString, Request};
 
-#[derive(Debug)]
-pub struct RequestBuilder;
-
-impl RequestBuilder {
-    pub fn version(self, http_version: Version) -> Step1 {
-        Step1 { http_version }
-    }
-}
+pub trait RequestBuilderState {}
 
 #[derive(Debug)]
-pub struct Step1 {
-    http_version: Version,
-}
-
-impl Step1 {
-    pub fn method(self, method: Method) -> Step2 {
-        let Self { http_version } = self;
-        Step2 {
-            http_version,
-            method,
-        }
-    }
-}
+pub struct WithBody;
 
 #[derive(Debug)]
-pub struct Step2 {
-    http_version: Version,
-    method: Method,
-}
+pub struct WithOutBody;
 
-impl Step2 {
-    pub fn path(self, path: UrlPath) -> Step3 {
-        let Self {
-            http_version,
-            method,
-        } = self;
+impl RequestBuilderState for WithBody {}
+
+impl RequestBuilderState for WithOutBody {}
+
+#[derive(Debug)]
+pub struct RequestBuilderDelete;
+
+impl RequestBuilderDelete {
+    pub fn path(self, path: UrlPath) -> Step3<WithOutBody> {
+        let http_version = Version::default();
+        let method = Method::Delete;
+
         Step3 {
             http_version,
             method,
             path,
             query_string: QueryString::empty(),
             headers: Headers::default_for_request(),
+            _state: PhantomData,
         }
     }
 }
 
 #[derive(Debug)]
-pub struct Step3 {
+pub struct RequestBuilderGet;
+impl RequestBuilderGet {
+    pub fn path(self, path: UrlPath) -> Step3<WithOutBody> {
+        let http_version = Version::default();
+        let method = Method::Get;
+
+        Step3 {
+            http_version,
+            method,
+            path,
+            query_string: QueryString::empty(),
+            headers: Headers::default_for_request(),
+            _state: PhantomData,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RequestBuilderHead;
+
+impl RequestBuilderHead {
+    pub fn path(self, path: UrlPath) -> Step3<WithOutBody> {
+        let http_version = Version::default();
+        let method = Method::Head;
+
+        Step3 {
+            http_version,
+            method,
+            path,
+            query_string: QueryString::empty(),
+            headers: Headers::default_for_request(),
+            _state: PhantomData,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RequestBuilderLink;
+
+impl RequestBuilderLink {
+    pub fn path(self, path: UrlPath) -> Step3<WithOutBody> {
+        let http_version = Version::default();
+        let method = Method::Link;
+
+        Step3 {
+            http_version,
+            method,
+            path,
+            query_string: QueryString::empty(),
+            headers: Headers::default_for_request(),
+            _state: PhantomData,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RequestBuilderPost;
+
+impl RequestBuilderPost {
+    pub fn path(self, path: UrlPath) -> Step3<WithBody> {
+        let http_version = Version::default();
+        let method = Method::Post;
+
+        Step3 {
+            http_version,
+            method,
+            path,
+            query_string: QueryString::empty(),
+            headers: Headers::default_for_request(),
+            _state: PhantomData,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RequestBuilderPut;
+
+impl RequestBuilderPut {
+    pub fn path(self, path: UrlPath) -> Step3<WithBody> {
+        let http_version = Version::default();
+        let method = Method::Put;
+
+        Step3 {
+            http_version,
+            method,
+            path,
+            query_string: QueryString::empty(),
+            headers: Headers::default_for_request(),
+            _state: PhantomData,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RequestBuilderUnlink;
+
+impl RequestBuilderUnlink {
+    pub fn path(self, path: UrlPath) -> Step3<WithOutBody> {
+        let http_version = Version::default();
+        let method = Method::Unlink;
+
+        Step3 {
+            http_version,
+            method,
+            path,
+            query_string: QueryString::empty(),
+            headers: Headers::default_for_request(),
+            _state: PhantomData,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct Step3<B: RequestBuilderState> {
     http_version: Version,
     method: Method,
     path: UrlPath,
     query_string: QueryString,
     headers: Headers,
+    _state: PhantomData<B>,
 }
 
-impl Step3 {
-    pub fn add_qs_entry(self, qs_entry: QsEntry) -> Step3 {
+impl Step3<WithOutBody> {
+    pub fn add_qs_entry(self, qs_entry: QsEntry) -> Step3<WithOutBody> {
         let Self {
             http_version,
             method,
             path,
             mut query_string,
             headers,
+            ..
         } = self;
 
         query_string.add(qs_entry);
@@ -75,15 +177,17 @@ impl Step3 {
             path,
             query_string,
             headers,
+            _state: PhantomData,
         }
     }
-    pub fn add_header<H: IntoHeader>(self, header: H) -> Step3 {
+    pub fn add_header<H: IntoHeader>(self, header: H) -> Step3<WithOutBody> {
         let Self {
             http_version,
             method,
             path,
             query_string,
             mut headers,
+            ..
         } = self;
 
         headers.add(header.into_header());
@@ -94,6 +198,72 @@ impl Step3 {
             path,
             query_string,
             headers,
+            _state: PhantomData,
+        }
+    }
+
+    pub fn finish(self) -> Request {
+        let Self {
+            http_version,
+            method,
+            path,
+            query_string,
+            headers,
+            ..
+        } = self;
+
+        Request {
+            http_version,
+            method,
+            path,
+            query_string,
+            headers,
+            body: None,
+        }
+    }
+}
+
+impl Step3<WithBody> {
+    pub fn add_qs_entry(self, qs_entry: QsEntry) -> Step3<WithBody> {
+        let Self {
+            http_version,
+            method,
+            path,
+            mut query_string,
+            headers,
+            ..
+        } = self;
+
+        query_string.add(qs_entry);
+
+        Step3 {
+            http_version,
+            method,
+            path,
+            query_string,
+            headers,
+            _state: PhantomData,
+        }
+    }
+    pub fn add_header<H: IntoHeader>(self, header: H) -> Step3<WithBody> {
+        let Self {
+            http_version,
+            method,
+            path,
+            query_string,
+            mut headers,
+            ..
+        } = self;
+
+        headers.add(header.into_header());
+
+        Step3 {
+            http_version,
+            method,
+            path,
+            query_string,
+            headers,
+            _state: PhantomData,
         }
     }
     pub fn set_body(self, body: Body) -> Step4 {
@@ -103,6 +273,7 @@ impl Step3 {
             path,
             query_string,
             headers,
+            ..
         } = self;
         Step4 {
             http_version,
@@ -120,6 +291,7 @@ impl Step3 {
             path,
             query_string,
             headers,
+            ..
         } = self;
 
         Request {

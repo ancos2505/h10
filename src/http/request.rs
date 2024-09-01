@@ -3,9 +3,12 @@ pub mod builder;
 #[cfg(test)]
 mod tests;
 
-use std::rc::Rc;
+use std::{fmt::Display, rc::Rc};
 
-use builder::RequestBuilder;
+use builder::{
+    RequestBuilderDelete, RequestBuilderGet, RequestBuilderHead, RequestBuilderLink,
+    RequestBuilderPost, RequestBuilderPut, RequestBuilderUnlink,
+};
 
 use crate::{
     constants::{AsciiWhiteSpace, MAX_REQUEST_LENGTH},
@@ -32,8 +35,27 @@ pub struct Request {
 }
 
 impl Request {
-    pub fn builder() -> RequestBuilder {
-        RequestBuilder
+    // * Builders
+    pub fn delete() -> RequestBuilderDelete {
+        RequestBuilderDelete
+    }
+    pub fn get() -> RequestBuilderGet {
+        RequestBuilderGet
+    }
+    pub fn head() -> RequestBuilderHead {
+        RequestBuilderHead
+    }
+    pub fn link() -> RequestBuilderLink {
+        RequestBuilderLink
+    }
+    pub fn post() -> RequestBuilderPost {
+        RequestBuilderPost
+    }
+    pub fn put() -> RequestBuilderPut {
+        RequestBuilderPut
+    }
+    pub fn unlink() -> RequestBuilderUnlink {
+        RequestBuilderUnlink
     }
 
     pub fn parse(bytes: &[u8]) -> H10LibResult<Request> {
@@ -94,7 +116,7 @@ impl Request {
 
         let path = match maybe_path_str {
             Some(inner_str) => UrlPath::parse(inner_str)?,
-            None => UrlPath::default(),
+            None => UrlPath::root(),
         };
 
         let query_string = QueryString::parse(maybe_qs_str)?;
@@ -216,5 +238,30 @@ impl Request {
 
     pub fn body(&self) -> Option<&Body> {
         self.body.as_ref()
+    }
+}
+
+impl Display for Request {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut output = "".to_owned();
+        output.push_str(&self.method.to_string());
+        output.push(' ');
+        output.push_str(&self.path.to_string());
+        output.push(' ');
+        output.push_str(&self.http_version.to_string());
+        output.push_str("\r\n");
+
+        for header_entry in self.headers.iter() {
+            output.push_str(&header_entry.to_string());
+            output.push_str("\r\n");
+        }
+
+        if let Some(body) = &self.body {
+            output.push_str("\r\n");
+            output.push_str(&body.to_string());
+            output.push_str("\n");
+        }
+
+        write!(f, "{}", output)
     }
 }

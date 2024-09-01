@@ -6,6 +6,8 @@ use std::{
     sync::{atomic::AtomicUsize, OnceLock},
 };
 
+use server::ServerError;
+
 use crate::server::{Cli, HttpServer, ServerResult};
 
 // Unsafe
@@ -23,18 +25,18 @@ fn main() -> ExitCode {
     match smain() {
         Ok(_) => ExitCode::SUCCESS,
         Err(err) => match err {
-            server::ServerError::InvalidCLiArgs(arg) => {
+            ServerError::InvalidCLiArgs(arg) => {
                 eprintln!("Error: unexpected argument '{arg}'\n");
                 Cli::usage();
                 ExitCode::FAILURE
             }
-            server::ServerError::H10LibError(_)
-            | server::ServerError::StdIoError(_)
-            | server::ServerError::AddrParseError(_)
-            | server::ServerError::PoisonErrorRwLockReadGuard
-            | server::ServerError::PortParseError
-            | server::ServerError::InvalidLogLevel
-            | server::ServerError::Custom(_) => ExitCode::from(2),
+            // ServerError::H10LibError(_)
+            ServerError::StdIoError
+            | ServerError::AddrParseError
+            | ServerError::PoisonErrorRwLockReadGuard
+            | ServerError::PortParseError
+            | ServerError::InvalidLogLevel
+            | ServerError::Custom(_) => ExitCode::from(2),
         },
     }
 }

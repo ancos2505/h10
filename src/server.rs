@@ -21,7 +21,7 @@ use h10::http::{
     status_code::StatusCode,
 };
 
-use self::log::LogLevel;
+// use self::log::LogLevel;
 
 pub(crate) use self::{
     cli::Cli,
@@ -130,7 +130,7 @@ impl HttpServer {
 
         let opened_sessions = match act_session.try_lock() {
             Ok(data) => Some(*data),
-            Err(error) => {
+            Err(_) => {
                 // dbg!(error);
                 None
             }
@@ -144,13 +144,13 @@ impl HttpServer {
                         *data += 1;
                         // dbg!(*data);
                     }
-                    Err(error) => {
+                    Err(_) => {
                         // dbg!(error);
                     }
                 };
                 match Self::handle_read(&stream) {
                     Ok(res) => res,
-                    Err(error) => {
+                    Err(_) => {
                         // dbg!(error);
                         ServerResponse::new(StatusCode::ServiceUnavailable)
                     }
@@ -162,9 +162,7 @@ impl HttpServer {
             ServerResponse::new(StatusCode::ServiceUnavailable)
         };
 
-        if let Err(error) =
-            Self::handle_write(arc_prev_stats, stream, response_str, arc_act_session)
-        {
+        if let Err(_) = Self::handle_write(arc_prev_stats, stream, response_str, arc_act_session) {
             // dbg!(error);
         }
 
@@ -213,7 +211,7 @@ impl HttpServer {
                 *data -= 1;
                 // dbg!(*data);
             }
-            Err(error) => {
+            Err(_) => {
                 // dbg!(error);
             }
         };
