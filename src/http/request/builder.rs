@@ -6,7 +6,7 @@ use super::{Body, Headers, QsEntry, QueryString, Request};
 pub struct RequestBuilder;
 
 impl RequestBuilder {
-    pub fn version(http_version: Version) -> Step1 {
+    pub fn version(self, http_version: Version) -> Step1 {
         Step1 { http_version }
     }
 }
