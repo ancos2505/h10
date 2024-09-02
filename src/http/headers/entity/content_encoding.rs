@@ -19,7 +19,7 @@ impl Default for ContentEncoding {
     fn default() -> Self {
         Self {
             name: HeaderName::new_unchecked("Content-Encoding"),
-            value: HeaderValue::new_unchecked("NotDefined"),
+            value: HeaderValue::new_unchecked("Not_Defined"),
         }
     }
 }

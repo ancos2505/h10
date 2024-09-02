@@ -14,7 +14,7 @@ pub struct WWWAuthenticate {
 //     fn example() -> Self {
 //         Self {
 //             name: HeaderName::new_unchecked("WWW-Authenticate"),
-//             value: HeaderValue::new_unchecked("NotDefined"),
+//             value: HeaderValue::new_unchecked("Not_Defined"),
 //         }
 //     }
 // }

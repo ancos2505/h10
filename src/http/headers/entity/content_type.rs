@@ -22,7 +22,7 @@ impl Default for ContentType {
     fn default() -> Self {
         Self {
             name: HeaderName::new_unchecked("Content-Type"),
-            value: HeaderValue::new_unchecked("NotDefined"),
+            value: HeaderValue::new_unchecked("Not_Defined"),
         }
     }
 }
