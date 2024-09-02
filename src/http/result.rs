@@ -5,6 +5,7 @@ use std::{
     num::{ParseFloatError, ParseIntError},
     str::Utf8Error,
     string::FromUtf8Error,
+    sync::mpsc::SendError,
     time::SystemTimeError,
 };
 
@@ -29,6 +30,8 @@ pub enum H10LibError {
     ResponseParser(String),
     IoError(IoError),
     StrFromAscii(String),
+    ClientError(H10ClientError),
+    MpscSendError,
     Custom(String),
 }
 
@@ -37,6 +40,19 @@ impl H10LibError {
         Self::Custom(msg.to_owned())
     }
 }
+
+#[derive(Debug)]
+pub enum H10ClientError {
+    Timeout,
+    InternalError(String),
+}
+
+impl<T: ToString> From<SendError<T>> for H10LibError {
+    fn from(_: SendError<T>) -> Self {
+        Self::MpscSendError
+    }
+}
+
 impl From<FromUtf8Error> for H10LibError {
     fn from(_: FromUtf8Error) -> Self {
         Self::FromUtf8Error
@@ -99,6 +115,8 @@ impl From<H10LibError> for StatusCode {
             | H10LibError::ParseIntError(_)
             | H10LibError::IoError(_)
             | H10LibError::Custom(_)
+            | H10LibError::ClientError(_)
+            | H10LibError::MpscSendError
             | H10LibError::FromUtf8Error => StatusCode::InternalServerError,
         }
     }

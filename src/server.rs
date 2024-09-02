@@ -162,8 +162,16 @@ impl HttpServer {
             ServerResponse::new(StatusCode::ServiceUnavailable)
         };
 
-        if let Err(_) = Self::handle_write(arc_prev_stats, stream, response_str, arc_act_session) {
-            // dbg!(error);
+        match Self::handle_write(arc_prev_stats, stream, response_str, arc_act_session) {
+            Ok(_) => {
+                println!(
+                    "Response generated in {} secs. ",
+                    now.elapsed().as_secs_f64(),
+                );
+            }
+            Err(err) => {
+                println!("Error on sending Reponse. Reason: {err}.",);
+            }
         }
 
         // println!(
@@ -171,15 +179,8 @@ impl HttpServer {
         //     opened_sessions,
         //     now.elapsed().as_secs_f64(),
         // );
-        println!(
-            "Response generated in {} secs. ",
-            now.elapsed().as_secs_f64(),
-        );
     }
     fn handle_read(mut stream: &TcpStream) -> H10LibResult<ServerResponse> {
-        // let slow_motion = Duration::from_millis(1234);
-        // dbg!(slow_motion);
-        // sleep(slow_motion);
         // TODO
         let mut buf = [0u8; Self::CHUNK_SIZE];
         match stream.read(&mut buf) {

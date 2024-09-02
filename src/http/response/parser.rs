@@ -2,7 +2,7 @@ use core::str;
 use std::rc::Rc;
 
 use crate::{
-    constants::{AsciiWhiteSpace, MAX_RESPONSE_LENGTH},
+    constants::MAX_RESPONSE_LENGTH,
     http::{
         body::Body,
         headers::{ContentLength, IntoHeader},
@@ -37,7 +37,7 @@ impl ResponseParser {
         let status = Self::parse_statuscode(status_line_bytes)?;
 
         println!(
-            "Status-Line security check in {} secs",
+            "ResponseParser: Status-Line security check in {} secs",
             now.elapsed().as_secs_f64()
         );
 
@@ -65,42 +65,21 @@ impl ResponseParser {
                     "Invalid HTTP Response on split headers and body".into(),
                 ))?;
 
-        // let first_line = headers_region
-        //     .split("\r\n")
-        //     .next()
-        //     .ok_or(H10LibError::ResponseParser(
-        //         "Malformed HTTP Response Headers".into(),
-        //     ))?;
-
-        // let (_, first_line_remaining) =
-        //     first_line
-        //         .split_once(AsciiWhiteSpace::as_str())
-        //         .ok_or(H10LibError::ResponseParser(
-        //             "Malformed HTTP Header Method line".into(),
-        //         ))?;
-
-        // let (url_str, _) = first_line_remaining
-        //     .split_once(AsciiWhiteSpace::as_str())
-        //     .ok_or(H10LibError::ResponseParser(
-        //         "Malformed HTTP Header Method line on searching for Url path".into(),
-        //     ))?;
-
-        // let (maybe_path_str, maybe_qs_str) = Self::parse_url(url_str)?;
-
         let headers = Headers::parse(headers_region)?;
 
         let body: Body = body_region.parse()?;
-        let body_length = body.len();
+        let body_length_number = body.len();
 
         let maybe_content_length = headers.get(ContentLength::default().into_header().name());
         if let Some(content_length) = maybe_content_length {
-            if body_length != content_length.value().parse()? {
+            let content_length_number = content_length.value().parse()?;
+            if body_length_number != content_length_number {
                 return Err(H10LibError::InvalidInputData(
-                    "Invalid body by Content-Length header".into(),
+                    format!("Invalid body by Content-Length header. content_length_number: {}, body.len(): {}",content_length_number,body_length_number),
                 ));
             }
         } else {
-            if body_length > 0 {
+            if body_length_number > 0 {
                 return Err(H10LibError::InvalidInputData(
                     "Invalid body by nonexistence of Content-Length header".into(),
                 ));
@@ -184,17 +163,5 @@ impl ResponseParser {
 
         let version = std::str::from_utf8(bytes)?;
         version.parse()
-    }
-
-    fn parse_url<'a>(input: &'a str) -> H10LibResult<(Option<&'a str>, Option<&'a str>)> {
-        let trimmed = input.trim();
-        if trimmed.contains("?") {
-            let (path_str, query_string) = input.split_once("?").ok_or(
-                H10LibError::ResponseParser("Malformed UrlPath in HTTP Header Method line".into()),
-            )?;
-            Ok((Some(path_str), Some(query_string)))
-        } else {
-            Ok((Some(trimmed), None))
-        }
     }
 }

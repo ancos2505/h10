@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use h10::{
     client::HttpClient,
     http::{request::Request, result::H10LibResult, url_path::UrlPath},
@@ -15,15 +17,18 @@ fn main() -> H10LibResult<()> {
     println!("Request to launch:");
     println!("{request}");
 
-    let response = HttpClient::launch(request, connect_str)?;
+    let timeout = Duration::from_secs(5);
+
+    let res = HttpClient::launch(request, connect_str, timeout);
+    dbg!(&res);
+    let response = res?;
 
     println!(
         "Response from http://{connect_str} in {} secs:",
         start.elapsed().as_secs_f32()
     );
+
     println!("{response}");
 
-    // dbg!(response, bytes_read, start.elapsed().as_millis());
-    // assert_eq!(expected_str, &*request.to_string())
     Ok(())
 }
