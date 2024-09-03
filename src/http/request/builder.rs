@@ -26,7 +26,7 @@ pub struct RequestBuilderDelete;
 
 impl RequestBuilderDelete {
     pub fn path(self, path: UrlPath) -> Step3<WithOutBody> {
-        let http_version = Version::default();
+        let http_version = Version::Http1_0;
         let method = Method::Delete;
 
         Step3 {
@@ -44,7 +44,7 @@ impl RequestBuilderDelete {
 pub struct RequestBuilderGet;
 impl RequestBuilderGet {
     pub fn path(self, path: UrlPath) -> Step3<WithOutBody> {
-        let http_version = Version::default();
+        let http_version = Version::Http1_0;
         let method = Method::Get;
 
         Step3 {
@@ -63,7 +63,7 @@ pub struct RequestBuilderHead;
 
 impl RequestBuilderHead {
     pub fn path(self, path: UrlPath) -> Step3<WithOutBody> {
-        let http_version = Version::default();
+        let http_version = Version::Http1_0;
         let method = Method::Head;
 
         Step3 {
@@ -82,7 +82,7 @@ pub struct RequestBuilderLink;
 
 impl RequestBuilderLink {
     pub fn path(self, path: UrlPath) -> Step3<WithOutBody> {
-        let http_version = Version::default();
+        let http_version = Version::Http1_0;
         let method = Method::Link;
 
         Step3 {
@@ -101,7 +101,7 @@ pub struct RequestBuilderPost;
 
 impl RequestBuilderPost {
     pub fn path(self, path: UrlPath) -> Step3<WithBody> {
-        let http_version = Version::default();
+        let http_version = Version::Http1_0;
         let method = Method::Post;
 
         Step3 {
@@ -120,7 +120,7 @@ pub struct RequestBuilderPut;
 
 impl RequestBuilderPut {
     pub fn path(self, path: UrlPath) -> Step3<WithBody> {
-        let http_version = Version::default();
+        let http_version = Version::Http1_0;
         let method = Method::Put;
 
         Step3 {
@@ -139,7 +139,7 @@ pub struct RequestBuilderUnlink;
 
 impl RequestBuilderUnlink {
     pub fn path(self, path: UrlPath) -> Step3<WithOutBody> {
-        let http_version = Version::default();
+        let http_version = Version::Http1_0;
         let method = Method::Unlink;
 
         Step3 {

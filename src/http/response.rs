@@ -24,10 +24,10 @@ impl Response {
     // * Builders
     pub fn new(status: StatusCode) -> Self {
         Self {
-            http_version: Default::default(),
+            http_version: Version::Http1_0,
             status,
-            headers: Default::default(),
-            body: Default::default(),
+            headers: Headers::empty(),
+            body: None,
         }
     }
 

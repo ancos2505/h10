@@ -22,7 +22,7 @@ use super::{
     version::Version,
 };
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Request {
     pub http_version: Version,
     pub method: Method,

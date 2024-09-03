@@ -7,7 +7,7 @@ use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
 ///
 /// Reference: https://www.rfc-editor.org/rfc/rfc1945.html#appendix-D.2.6
 ///
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Title {
     name: HeaderName,
     value: HeaderValue,

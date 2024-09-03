@@ -7,10 +7,9 @@ use crate::http::result::H10LibError;
 /// Reference: https://www.rfc-editor.org/rfc/rfc1945.html#section-5.1.1
 ///
 /// Aditional methods: https://www.rfc-editor.org/rfc/rfc1945.html#appendix-D.1
-#[derive(Debug, Default)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Method {
     Get,
-    #[default]
     Head,
     Post,
     // Aditional methods,

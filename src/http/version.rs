@@ -2,9 +2,8 @@ use std::{fmt::Display, str::FromStr};
 
 use crate::http::result::H10LibError;
 
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Version {
-    #[default]
     Http1_0,
     Http1_1,
 }

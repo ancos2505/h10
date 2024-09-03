@@ -8,11 +8,6 @@ use crate::{
 #[derive(Debug, PartialEq, Eq)]
 pub struct UrlPath(Rc<str>);
 
-impl Default for UrlPath {
-    fn default() -> Self {
-        Self::root()
-    }
-}
 impl UrlPath {
     pub fn new_unchecked(s: &str) -> Self {
         Self(s.into())

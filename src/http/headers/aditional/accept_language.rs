@@ -9,7 +9,7 @@ use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
 ///
 /// Reference: https://www.rfc-editor.org/rfc/rfc1945.html#appendix-D.2.4
 ///
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct AcceptLanguage {
     name: HeaderName,
     value: HeaderValue,

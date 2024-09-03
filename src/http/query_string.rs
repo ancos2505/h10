@@ -2,7 +2,7 @@ use std::{ops::Deref, rc::Rc, str::FromStr};
 
 use crate::http::result::{H10LibError, H10LibResult};
 
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct QueryString(Vec<QsEntry>);
 impl QueryString {
     pub fn empty() -> Self {

@@ -30,7 +30,7 @@ use std::{ops::Deref, rc::Rc, str::FromStr};
 
 use crate::http::result::{H10LibError, H10LibResult};
 
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Headers(Vec<HeaderEntry>);
 impl Headers {
     pub fn empty() -> Self {
