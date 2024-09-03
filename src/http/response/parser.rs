@@ -57,32 +57,36 @@ impl ResponseParser {
 
         let rc_request_str: Rc<str> = request_str.into();
 
-        // TODO: Check on RFC the expected behavior without body
-        let (headers_region, body_region) =
-            rc_request_str
-                .split_once("\r\n\r\n")
-                .ok_or(H10LibError::ResponseParser(
-                    "Invalid HTTP Response on split headers and body".into(),
-                ))?;
-
+        let mut iter_response_parts = rc_request_str.split("\r\n\r\n");
+        let headers_region = iter_response_parts
+            .next()
+            .ok_or(H10LibError::ResponseParser(
+                "Invalid HTTP Response on split headers and body".into(),
+            ))?;
         let headers = Headers::parse(headers_region)?;
 
-        let body: Body = body_region.parse()?;
-        let body_length_number = body.len();
+        let mut maybe_body: Option<Body> = None;
 
-        let maybe_content_length = headers.get(ContentLength::default().into_header().name());
-        if let Some(content_length) = maybe_content_length {
-            let content_length_number = content_length.value().parse()?;
-            if body_length_number != content_length_number {
-                return Err(H10LibError::InvalidInputData(
-                    format!("Invalid body by Content-Length header. content_length_number: {}, body.len(): {}",content_length_number,body_length_number),
-                ));
-            }
-        } else {
-            if body_length_number > 0 {
-                return Err(H10LibError::InvalidInputData(
-                    "Invalid body by nonexistence of Content-Length header".into(),
-                ));
+        if let Some(body_region) = iter_response_parts.next() {
+            let body_inner: Body = body_region.parse()?;
+            let body_length_number = body_inner.len();
+
+            let maybe_content_length = headers.get(ContentLength::default().into_header().name());
+            if let Some(content_length) = maybe_content_length {
+                let content_length_number = content_length.value().parse()?;
+                if body_length_number == content_length_number {
+                    maybe_body = Some(body_inner);
+                } else {
+                    return Err(H10LibError::InvalidInputData(
+                        format!("Invalid body by Content-Length header. content_length_number: {}, body.len(): {}",content_length_number,body_length_number),
+                    ));
+                }
+            } else {
+                if body_length_number > 0 {
+                    return Err(H10LibError::InvalidInputData(
+                        "Invalid body by nonexistence of Content-Length header".into(),
+                    ));
+                }
             }
         }
 
@@ -90,7 +94,7 @@ impl ResponseParser {
             http_version,
             status,
             headers,
-            body: Some(body),
+            body: maybe_body,
         })
     }
 
