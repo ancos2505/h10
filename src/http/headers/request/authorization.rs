@@ -1,4 +1,7 @@
-use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
+use crate::http::{
+    headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader},
+    result::H10LibResult,
+};
 
 /// ### Authorization
 /// Related: Authentication
@@ -16,6 +19,15 @@ impl Default for Authorization {
             name: HeaderName::new_unchecked("Authorization"),
             value: HeaderValue::new_unchecked("Not_Defined"),
         }
+    }
+}
+
+impl Authorization {
+    pub fn new(new_value: &str) -> H10LibResult<Self> {
+        Ok(Self {
+            value: new_value.parse()?,
+            ..Default::default()
+        })
     }
 }
 
