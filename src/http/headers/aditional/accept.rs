@@ -27,7 +27,6 @@ impl Default for Accept {
     }
 }
 
-
 impl IntoHeader for Accept {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

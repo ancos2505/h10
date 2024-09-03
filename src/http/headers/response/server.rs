@@ -29,15 +29,23 @@ impl Default for Server {
 }
 
 impl Server {
-    #[allow(dead_code)]
-    pub(crate) fn custom<S: AsRef<str>>(server_string: S) -> H10LibResult<Self> {
-        let value_str = server_string.as_ref();
+    pub fn custom(product_name: &str, product_version: &str) -> H10LibResult<Self> {
+        let new_value = format!(
+            "{prodname}/{prodversion} {library}",
+            prodname = product_name,
+            prodversion = product_version,
+            library = library_str()
+        );
 
         Ok(Self {
-            value: value_str.parse()?,
+            value: new_value.parse()?,
             ..Default::default()
         })
     }
+}
+
+fn library_str() -> String {
+    format!("{}/{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"))
 }
 
 impl IntoHeader for Server {

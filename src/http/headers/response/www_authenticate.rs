@@ -1,4 +1,7 @@
-use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
+use crate::http::{
+    headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader},
+    result::H10LibResult,
+};
 
 /// ### WWW-Authenticate header
 /// Related: Authentication/Authorization/Session
@@ -16,6 +19,15 @@ impl Default for WWWAuthenticate {
             name: HeaderName::new_unchecked("WWW-Authenticate"),
             value: HeaderValue::new_unchecked("Not_Defined"),
         }
+    }
+}
+
+impl WWWAuthenticate {
+    pub fn new(new_value: &str) -> H10LibResult<Self> {
+        Ok(Self {
+            value: new_value.parse()?,
+            ..Default::default()
+        })
     }
 }
 

@@ -22,18 +22,18 @@ impl Default for From {
     }
 }
 
-impl IntoHeader for From {
-    fn into_header(self) -> HeaderEntry {
-        let Self { name, value } = self;
-        HeaderEntry { name, value }
-    }
-}
-
 impl From {
     pub fn new(new_value: &str) -> H10LibResult<Self> {
         Ok(Self {
             value: new_value.parse()?,
             ..Default::default()
         })
+    }
+}
+
+impl IntoHeader for From {
+    fn into_header(self) -> HeaderEntry {
+        let Self { name, value } = self;
+        HeaderEntry { name, value }
     }
 }

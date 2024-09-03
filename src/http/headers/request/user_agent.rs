@@ -13,10 +13,12 @@ pub struct UserAgent {
     value: HeaderValue,
 }
 
-impl IntoHeader for UserAgent {
-    fn into_header(self) -> HeaderEntry {
-        let Self { name, value } = self;
-        HeaderEntry { name, value }
+impl Default for UserAgent {
+    fn default() -> Self {
+        Self {
+            name: HeaderName::new_unchecked("User-Agent"),
+            value: HeaderValue::new_unchecked(library_str().as_str()),
+        }
     }
 }
 
@@ -36,15 +38,13 @@ impl UserAgent {
     }
 }
 
-impl Default for UserAgent {
-    fn default() -> Self {
-        Self {
-            name: HeaderName::new_unchecked("User-Agent"),
-            value: HeaderValue::new_unchecked(library_str().as_str()),
-        }
-    }
-}
-
 fn library_str() -> String {
     format!("{}/{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"))
+}
+
+impl IntoHeader for UserAgent {
+    fn into_header(self) -> HeaderEntry {
+        let Self { name, value } = self;
+        HeaderEntry { name, value }
+    }
 }
