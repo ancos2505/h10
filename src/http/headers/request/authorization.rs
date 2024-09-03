@@ -1,4 +1,4 @@
-use crate::http::headers::{HeaderName, HeaderValue};
+use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
 
 /// ### Authorization
 /// Related: Authentication
@@ -8,4 +8,20 @@ use crate::http::headers::{HeaderName, HeaderValue};
 pub struct Authorization {
     name: HeaderName,
     value: HeaderValue,
+}
+
+impl Default for Authorization {
+    fn default() -> Self {
+        Self {
+            name: HeaderName::new_unchecked("Authorization"),
+            value: HeaderValue::new_unchecked("Not_Defined"),
+        }
+    }
+}
+
+impl IntoHeader for Authorization {
+    fn into_header(self) -> HeaderEntry {
+        let Self { name, value } = self;
+        HeaderEntry { name, value }
+    }
 }

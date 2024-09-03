@@ -13,6 +13,15 @@ pub struct Title {
     value: HeaderValue,
 }
 
+impl Default for Title {
+    fn default() -> Self {
+        Self {
+            name: HeaderName::new_unchecked("Title"),
+            value: HeaderValue::new_unchecked("Not_Defined"),
+        }
+    }
+}
+
 impl IntoHeader for Title {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

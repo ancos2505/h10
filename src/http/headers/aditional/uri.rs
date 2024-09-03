@@ -16,6 +16,15 @@ pub struct URI {
     value: HeaderValue,
 }
 
+impl Default for URI {
+    fn default() -> Self {
+        Self {
+            name: HeaderName::new_unchecked("URI"),
+            value: HeaderValue::new_unchecked("Not_Defined"),
+        }
+    }
+}
+
 impl IntoHeader for URI {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

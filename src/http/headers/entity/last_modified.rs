@@ -1,4 +1,4 @@
-use crate::http::headers::{HeaderName, HeaderValue};
+use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
 
 /// ### Last-Modified
 /// Related: Content state
@@ -12,4 +12,20 @@ use crate::http::headers::{HeaderName, HeaderValue};
 pub struct LastModified {
     name: HeaderName,
     value: HeaderValue,
+}
+
+impl Default for LastModified {
+    fn default() -> Self {
+        Self {
+            name: HeaderName::new_unchecked("Last-Modified"),
+            value: HeaderValue::new_unchecked("Not_Defined"),
+        }
+    }
+}
+
+impl IntoHeader for LastModified {
+    fn into_header(self) -> HeaderEntry {
+        let Self { name, value } = self;
+        HeaderEntry { name, value }
+    }
 }

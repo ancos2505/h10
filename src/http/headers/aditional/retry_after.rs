@@ -17,6 +17,15 @@ pub struct RetryAfter {
     value: HeaderValue,
 }
 
+impl Default for RetryAfter {
+    fn default() -> Self {
+        Self {
+            name: HeaderName::new_unchecked("Retry-After"),
+            value: HeaderValue::new_unchecked("Not_Defined"),
+        }
+    }
+}
+
 impl IntoHeader for RetryAfter {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

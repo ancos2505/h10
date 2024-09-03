@@ -17,6 +17,15 @@ pub struct AcceptCharset {
     value: HeaderValue,
 }
 
+impl Default for AcceptCharset {
+    fn default() -> Self {
+        Self {
+            name: HeaderName::new_unchecked("Accept-Charset"),
+            value: HeaderValue::new_unchecked("Not_Defined"),
+        }
+    }
+}
+
 impl IntoHeader for AcceptCharset {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

@@ -16,6 +16,15 @@ pub struct Link {
     value: HeaderValue,
 }
 
+impl Default for Link {
+    fn default() -> Self {
+        Self {
+            name: HeaderName::new_unchecked("Link"),
+            value: HeaderValue::new_unchecked("Not_Defined"),
+        }
+    }
+}
+
 impl IntoHeader for Link {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

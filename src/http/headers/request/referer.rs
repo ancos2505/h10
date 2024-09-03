@@ -1,4 +1,4 @@
-use crate::http::headers::{HeaderName, HeaderValue};
+use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
 
 /// ### Referer
 /// Related:  back-links to resources for interest, logging, optimized caching,
@@ -9,4 +9,20 @@ use crate::http::headers::{HeaderName, HeaderValue};
 pub struct Referer {
     name: HeaderName,
     value: HeaderValue,
+}
+
+impl Default for Referer {
+    fn default() -> Self {
+        Self {
+            name: HeaderName::new_unchecked("Referer"),
+            value: HeaderValue::new_unchecked("Not_Defined"),
+        }
+    }
+}
+
+impl IntoHeader for Referer {
+    fn into_header(self) -> HeaderEntry {
+        let Self { name, value } = self;
+        HeaderEntry { name, value }
+    }
 }

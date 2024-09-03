@@ -14,6 +14,15 @@ pub struct AcceptEncoding {
     value: HeaderValue,
 }
 
+impl Default for AcceptEncoding {
+    fn default() -> Self {
+        Self {
+            name: HeaderName::new_unchecked("Accept-Encoding"),
+            value: HeaderValue::new_unchecked("Not_Defined"),
+        }
+    }
+}
+
 impl IntoHeader for AcceptEncoding {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

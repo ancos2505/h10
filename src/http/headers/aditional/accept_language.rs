@@ -15,6 +15,15 @@ pub struct AcceptLanguage {
     value: HeaderValue,
 }
 
+impl Default for AcceptLanguage {
+    fn default() -> Self {
+        Self {
+            name: HeaderName::new_unchecked("Accept-Language"),
+            value: HeaderValue::new_unchecked("Not_Defined"),
+        }
+    }
+}
+
 impl IntoHeader for AcceptLanguage {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

@@ -15,6 +15,15 @@ pub struct ContentLanguage {
     value: HeaderValue,
 }
 
+impl Default for ContentLanguage {
+    fn default() -> Self {
+        Self {
+            name: HeaderName::new_unchecked("Content-Language"),
+            value: HeaderValue::new_unchecked("Not_Defined"),
+        }
+    }
+}
+
 impl IntoHeader for ContentLanguage {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;
