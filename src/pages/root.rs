@@ -70,6 +70,12 @@ pub fn root(request: Request) -> H10LibResult<ServerResponse> {
         )
         .head_item(
             Link::builder()
+                .attr("href", "/assets/pico.min.css")
+                .attr("rel", "stylesheet")
+                .attr("type", "text/css"),
+        )
+        .head_item(
+            Link::builder()
                 .attr("href", "/assets/styles.css")
                 .attr("rel", "stylesheet")
                 .attr("type", "text/css"),

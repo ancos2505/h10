@@ -4,7 +4,7 @@ version = 3
 
 [[package]]
 name = "h10"
-version = "0.6.15"
+version = "0.6.16"
 dependencies = [
  "html-rs",
 ]
