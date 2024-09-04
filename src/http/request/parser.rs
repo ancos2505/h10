@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::{
     constants::{AsciiWhiteSpace, MAX_REQUEST_LENGTH},
@@ -40,7 +40,7 @@ impl RequestParser {
 
         let request_str = std::str::from_utf8(bytes)?;
 
-        let rc_request_str: Rc<str> = request_str.into();
+        let rc_request_str: Arc<str> = request_str.into();
 
         let (headers_region, body_region) =
             rc_request_str

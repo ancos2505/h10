@@ -1,5 +1,5 @@
 use core::str;
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::{
     constants::MAX_RESPONSE_LENGTH,
@@ -55,7 +55,7 @@ impl ResponseParser {
 
         let request_str = std::str::from_utf8(valid_bytes)?;
 
-        let rc_request_str: Rc<str> = request_str.into();
+        let rc_request_str: Arc<str> = request_str.into();
 
         let mut iter_response_parts = rc_request_str.split("\r\n\r\n");
         let headers_region = iter_response_parts

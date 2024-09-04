@@ -1,4 +1,4 @@
-use std::{fmt::Display, ops::Deref, rc::Rc, str::FromStr};
+use std::{fmt::Display, ops::Deref, str::FromStr, sync::Arc};
 
 use crate::http::result::H10LibError;
 
@@ -8,7 +8,7 @@ use crate::http::result::H10LibError;
 /// Reference: https://www.rfc-editor.org/rfc/rfc1867
 ///
 #[derive(Debug, PartialEq, Eq)]
-pub struct Body(Rc<str>);
+pub struct Body(Arc<str>);
 
 impl Body {
     pub fn new_unchecked(s: &str) -> Self {

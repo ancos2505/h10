@@ -26,7 +26,7 @@ pub trait IntoHeader {
     fn into_header(self) -> HeaderEntry;
 }
 
-use std::{ops::Deref, rc::Rc, str::FromStr};
+use std::{ops::Deref, str::FromStr, sync::Arc};
 
 use crate::http::result::{H10LibError, H10LibResult};
 
@@ -149,7 +149,7 @@ impl Display for HeaderEntry {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct HeaderName(Rc<str>);
+pub struct HeaderName(Arc<str>);
 
 impl HeaderName {
     pub fn new_unchecked<S: AsRef<str>>(name: S) -> Self {
@@ -181,7 +181,7 @@ impl Display for HeaderName {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct HeaderValue(Rc<str>);
+pub struct HeaderValue(Arc<str>);
 
 impl HeaderValue {
     pub fn new_unchecked<S: AsRef<str>>(name: S) -> Self {

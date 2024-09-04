@@ -1,4 +1,4 @@
-use std::{ops::Deref, rc::Rc, str::FromStr};
+use std::{ops::Deref, str::FromStr, sync::Arc};
 
 use crate::http::result::{H10LibError, H10LibResult};
 
@@ -91,7 +91,7 @@ impl FromStr for QsEntry {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct QsName(Rc<str>);
+pub struct QsName(Arc<str>);
 
 impl Deref for QsName {
     type Target = str;
@@ -110,7 +110,7 @@ impl FromStr for QsName {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct QsValue(Rc<str>);
+pub struct QsValue(Arc<str>);
 
 impl Deref for QsValue {
     type Target = str;

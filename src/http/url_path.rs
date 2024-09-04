@@ -1,4 +1,4 @@
-use std::{ops::Deref, rc::Rc};
+use std::{ops::Deref, sync::Arc};
 
 use crate::{
     constants::URL_PARTS_MAX_CHARS,
@@ -6,7 +6,7 @@ use crate::{
 };
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct UrlPath(Rc<str>);
+pub struct UrlPath(Arc<str>);
 
 impl UrlPath {
     pub fn new_unchecked(s: &str) -> Self {
