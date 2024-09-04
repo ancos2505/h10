@@ -1,6 +1,8 @@
+use std::str::FromStr;
+
 use crate::http::{
     headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader},
-    result::H10LibResult,
+    result::{H10LibError, H10LibResult},
 };
 
 /// ### Authorization
@@ -28,6 +30,22 @@ impl Authorization {
             value: new_value.parse()?,
             ..Default::default()
         })
+    }
+}
+
+impl FromStr for Authorization {
+    type Err = H10LibError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let entry: HeaderEntry = s.parse()?;
+        Ok(entry.into())
+    }
+}
+
+impl From<HeaderEntry> for Authorization {
+    fn from(value: HeaderEntry) -> Self {
+        let HeaderEntry { name, value } = value;
+        Self { name, value }
     }
 }
 

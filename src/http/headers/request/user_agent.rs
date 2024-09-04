@@ -1,6 +1,8 @@
+use std::str::FromStr;
+
 use crate::http::{
     headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader},
-    result::H10LibResult,
+    result::{H10LibError, H10LibResult},
 };
 
 /// ### User-Agent
@@ -40,6 +42,22 @@ impl UserAgent {
 
 fn library_str() -> String {
     format!("{}/{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"))
+}
+
+impl FromStr for UserAgent {
+    type Err = H10LibError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let entry: HeaderEntry = s.parse()?;
+        Ok(entry.into())
+    }
+}
+
+impl From<HeaderEntry> for UserAgent {
+    fn from(value: HeaderEntry) -> Self {
+        let HeaderEntry { name, value } = value;
+        Self { name, value }
+    }
 }
 
 impl IntoHeader for UserAgent {

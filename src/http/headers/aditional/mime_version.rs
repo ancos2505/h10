@@ -1,4 +1,9 @@
-use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
+use std::str::FromStr;
+
+use crate::http::{
+    headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader},
+    result::H10LibError,
+};
 
 /// ### MIME-Version
 /// Related: Content handling
@@ -24,6 +29,22 @@ impl Default for MIMEVersion {
             name: HeaderName::new_unchecked("MIME-Version"),
             value: HeaderValue::new_unchecked("Not_Defined"),
         }
+    }
+}
+
+impl FromStr for MIMEVersion {
+    type Err = H10LibError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let entry: HeaderEntry = s.parse()?;
+        Ok(entry.into())
+    }
+}
+
+impl From<HeaderEntry> for MIMEVersion {
+    fn from(value: HeaderEntry) -> Self {
+        let HeaderEntry { name, value } = value;
+        Self { name, value }
     }
 }
 

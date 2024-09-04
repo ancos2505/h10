@@ -1,4 +1,9 @@
-use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
+use std::str::FromStr;
+
+use crate::http::{
+    headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader},
+    result::H10LibError,
+};
 
 /// ### Content-Length header
 /// Related: Entity-Body
@@ -31,6 +36,22 @@ impl ContentLength {
         }
     }
 }
+impl FromStr for ContentLength {
+    type Err = H10LibError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let entry: HeaderEntry = s.parse()?;
+        Ok(entry.into())
+    }
+}
+
+impl From<HeaderEntry> for ContentLength {
+    fn from(value: HeaderEntry) -> Self {
+        let HeaderEntry { name, value } = value;
+        Self { name, value }
+    }
+}
+
 impl IntoHeader for ContentLength {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

@@ -1,6 +1,8 @@
+use std::str::FromStr;
+
 use crate::http::{
     headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader},
-    result::H10LibResult,
+    result::{H10LibError, H10LibResult},
 };
 
 /// ### Date header
@@ -21,6 +23,22 @@ impl Default for Date {
         }
     }
 }
+impl FromStr for Date {
+    type Err = H10LibError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let entry: HeaderEntry = s.parse()?;
+        Ok(entry.into())
+    }
+}
+
+impl From<HeaderEntry> for Date {
+    fn from(value: HeaderEntry) -> Self {
+        let HeaderEntry { name, value } = value;
+        Self { name, value }
+    }
+}
+
 impl IntoHeader for Date {
     fn into_header(self) -> HeaderEntry {
         let Self { name, value } = self;

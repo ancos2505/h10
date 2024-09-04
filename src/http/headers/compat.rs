@@ -1,4 +1,9 @@
-use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
+use std::str::FromStr;
+
+use crate::http::{
+    headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader},
+    result::H10LibError,
+};
 
 /// ### Connection
 /// Related: HTTP/1.1 compatibility
@@ -23,6 +28,22 @@ impl Default for Connection {
             name: HeaderName::new_unchecked("Connection"),
             value: HeaderValue::new_unchecked("close"),
         }
+    }
+}
+
+impl FromStr for Connection {
+    type Err = H10LibError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let entry: HeaderEntry = s.parse()?;
+        Ok(entry.into())
+    }
+}
+
+impl From<HeaderEntry> for Connection {
+    fn from(value: HeaderEntry) -> Self {
+        let HeaderEntry { name, value } = value;
+        Self { name, value }
     }
 }
 

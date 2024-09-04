@@ -1,4 +1,9 @@
-use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
+use std::str::FromStr;
+
+use crate::http::{
+    headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader},
+    result::H10LibError,
+};
 
 /// ### Accept
 /// Related: Content handling
@@ -24,6 +29,22 @@ impl Default for Accept {
             name: HeaderName::new_unchecked("Accept"),
             value: HeaderValue::new_unchecked("Not_Defined"),
         }
+    }
+}
+
+impl FromStr for Accept {
+    type Err = H10LibError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let entry: HeaderEntry = s.parse()?;
+        Ok(entry.into())
+    }
+}
+
+impl From<HeaderEntry> for Accept {
+    fn from(value: HeaderEntry) -> Self {
+        let HeaderEntry { name, value } = value;
+        Self { name, value }
     }
 }
 

@@ -1,4 +1,9 @@
-use crate::http::headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader};
+use std::str::FromStr;
+
+use crate::http::{
+    headers::{HeaderEntry, HeaderName, HeaderValue, IntoHeader},
+    result::H10LibError,
+};
 
 /// ### Content-Type header
 /// Related: Entity-Body
@@ -64,6 +69,22 @@ impl ContentType {
             value: HeaderValue::new_unchecked("application/x-www-form-urlencoded"),
             ..Default::default()
         }
+    }
+}
+
+impl FromStr for ContentType {
+    type Err = H10LibError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let entry: HeaderEntry = s.parse()?;
+        Ok(entry.into())
+    }
+}
+
+impl From<HeaderEntry> for ContentType {
+    fn from(value: HeaderEntry) -> Self {
+        let HeaderEntry { name, value } = value;
+        Self { name, value }
     }
 }
 
