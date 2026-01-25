@@ -1,13 +1,13 @@
 # h10
 
-Simple HTTP/1.0 Server with no external dependencies (WIP)
+Simple HTTP/1.0 Server with no external dependencies (WIP) - 100% human created code
 
 ## Getting Started
 
 
 ### Installation
 ```
-cargo install h10
+cargo install h10 --git=https://github.com/ancos2505/h10.git
 ```
 
 ### Installed mode
