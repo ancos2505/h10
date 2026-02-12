@@ -1,0 +1,3 @@
+[build]
+# Workaround on WSL errors
+incremental = false

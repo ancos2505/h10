@@ -7,7 +7,7 @@ use std::{
     collections::BTreeMap,
     io::{Read, Write},
     net::{TcpListener, TcpStream},
-    sync::{Arc, Mutex},
+    sync::{Arc, Mutex, RwLock},
     thread::{self},
     time::Instant,
 };
@@ -87,7 +87,7 @@ impl HttpServer {
                 return Ok(());
             }
 
-            let mut active_sessions = Arc::new(Mutex::new(0));
+            let mut active_sessions = Arc::new(RwLock::new(0));
 
             let list_str = Self::listener(cli);
             let listener = TcpListener::bind(&list_str)?;
@@ -118,21 +118,31 @@ impl HttpServer {
                         let act_session = Arc::clone(&active_sessions);
                         // TODO: Implement active sessions manager (What is a session? Why it is hangs?)
 
-                        thread::spawn(move || {
-                            Self::handle_client(&stats_mutex, stream, &act_session);
+                        let to_join = thread::spawn(move || {
+                            Self::handle_client(&stats_mutex, stream, &act_session)
                         });
-                        // incomming += 1;
-                        // dbg!(incomming);
-                        // let stats_mutex = Arc::clone(&prev_stats);
-                        // let act_session = Arc::clone(&active_sessions);
-                        // thread::spawn(move || {
-                        //     if let Ok(mut data) = stats_mutex.lock() {
-                        //         let _unused = Self::handle_client(&mut data, stream, act_session);
-                        //     }
-                        // });
+
+                        match to_join.join() {
+                            Ok(inner) => {
+                                if let Err(server_error) = inner {
+                                    error!(format!(
+                                        "Error: `{server_error}` on file [{}] in line {}",
+                                        file!(),
+                                        line!()
+                                    ));
+                                }
+                            }
+                            Err(err) => {
+                                error!(format!(
+                                    "Error: `{err:?}` on file [{}] in line {}",
+                                    file!(),
+                                    line!()
+                                ));
+                            }
+                        }
                     }
                     Err(e) => {
-                        println!("Unable to connect: {}", e);
+                        error!(format!("Unable to connect: {}", e));
                     }
                 }
             }
@@ -144,19 +154,17 @@ impl HttpServer {
         arc_prev_stats: &Arc<Mutex<BTreeMap<String, (u64, u64)>>>,
         // prev_stats: &mut BTreeMap<String, (u64, u64)>,
         stream: TcpStream,
-        arc_act_session: &Arc<Mutex<usize>>,
+        arc_act_session: &Arc<RwLock<usize>>,
     ) -> ServerResult<()> {
         let now = Instant::now();
 
-        let act_session = Arc::clone(arc_act_session);
-
-        let opened_sessions = count_active_sessions(&act_session)?;
+        let opened_sessions = count_active_sessions(&Arc::clone(arc_act_session))?;
 
         dbg!(opened_sessions);
 
         let response_str = if let Some(sessions) = opened_sessions {
             if sessions < MAX_ACTIVE_SESSIONS {
-                open_active_session(&act_session)?;
+                open_active_session(&Arc::clone(arc_act_session))?;
                 let server_response = match Self::handle_read(&stream) {
                     Ok(res) => res,
                     Err(error) => {
@@ -188,7 +196,7 @@ impl HttpServer {
             );
             ServerResponse::new(status)
         };
-        close_active_session(&act_session)?;
+        close_active_session(&Arc::clone(arc_act_session))?;
         match Self::handle_write(arc_prev_stats, stream, response_str, arc_act_session) {
             Ok(_) => {
                 println!(
@@ -201,7 +209,7 @@ impl HttpServer {
             }
         }
 
-        let opened_sessions = count_active_sessions(&act_session)?;
+        let opened_sessions = count_active_sessions(&Arc::clone(arc_act_session))?;
         println!(
             "Active sessions: {:?}. Response generated in {} secs. ",
             opened_sessions,
@@ -286,7 +294,7 @@ impl HttpServer {
         arc_prev_stats: &Arc<Mutex<BTreeMap<String, (u64, u64)>>>,
         mut stream: TcpStream,
         server_response: ServerResponse,
-        act_session: &Arc<Mutex<usize>>,
+        act_session: &Arc<RwLock<usize>>,
     ) -> H10LibResult<()> {
         // TODO: Implement Request generator properly.
         // let prev_stats = Arc::clone(arc_prev_stats);
@@ -306,15 +314,19 @@ impl HttpServer {
     }
 }
 
-fn count_active_sessions(act_session: &Arc<Mutex<usize>>) -> ServerResult<Option<usize>> {
+fn count_active_sessions(act_session: &Arc<RwLock<usize>>) -> ServerResult<Option<usize>> {
     let mut errors_count = 0;
     for _ in 1..=10 {
-        match act_session.try_lock() {
+        match act_session.read() {
             Ok(data) => {
                 return Ok(Some(*data));
             }
             Err(err) => {
-                dbg!(err);
+                eprintln!(
+                    "Error(status): {err} on file [{}] in line {}",
+                    file!(),
+                    line!()
+                );
                 errors_count += 1;
             }
         }
@@ -325,10 +337,10 @@ fn count_active_sessions(act_session: &Arc<Mutex<usize>>) -> ServerResult<Option
     Ok(None)
 }
 
-fn open_active_session(act_session: &Arc<Mutex<usize>>) -> ServerResult<()> {
+fn open_active_session(act_session: &Arc<RwLock<usize>>) -> ServerResult<()> {
     let mut errors_count = 0;
     for _ in 1..=10 {
-        match act_session.try_lock() {
+        match act_session.write() {
             Ok(mut data) => {
                 if *data <= MAX_ACTIVE_SESSIONS {
                     *data += 1;
@@ -338,7 +350,11 @@ fn open_active_session(act_session: &Arc<Mutex<usize>>) -> ServerResult<()> {
                 }
             }
             Err(err) => {
-                dbg!(err);
+                eprintln!(
+                    "Error(status): {err} on file [{}] in line {}",
+                    file!(),
+                    line!()
+                );
                 errors_count += 1;
             }
         }
@@ -349,10 +365,10 @@ fn open_active_session(act_session: &Arc<Mutex<usize>>) -> ServerResult<()> {
     Ok(())
 }
 
-fn close_active_session(act_session: &Arc<Mutex<usize>>) -> ServerResult<()> {
+fn close_active_session(act_session: &Arc<RwLock<usize>>) -> ServerResult<()> {
     let mut errors_count = 0;
     for _ in 1..=10 {
-        match act_session.try_lock() {
+        match act_session.write() {
             Ok(mut data) => {
                 if *data > 0 {
                     *data -= 1;
@@ -360,7 +376,11 @@ fn close_active_session(act_session: &Arc<Mutex<usize>>) -> ServerResult<()> {
                 }
             }
             Err(err) => {
-                dbg!(err);
+                eprintln!(
+                    "Error(status): {err} on file [{}] in line {}",
+                    file!(),
+                    line!()
+                );
                 errors_count += 1;
             }
         }
